@@ -1,0 +1,65 @@
+name: "Etsy Theory, Manufacturing & Customization Guided SKUs Studio"
+slug: "etsy-tony-full-product-studio"
+version: "1.1.0"
+default_mode: "FULL"
+internal_language: "zh-CN"
+buyer_language: "en-US"
+currency: "USD"
+master_skill: "etsy-tony-full-product-development"
+child_skills:
+  - "etsy-tony-full-competitor"
+  - "etsy-tony-full-manufacturing"
+  - "etsy-tony-full-design-system"
+  - "etsy-tony-full-skus"
+  - "etsy-tony-full-launch-pack"
+  - "etsy-tony-full-seller-operations"
+evidence_states:
+  - "Observed Fact"
+  - "Reasonable Inference"
+  - "Unknown"
+validation_flags:
+  - "Sample Test Required"
+  - "Physical Sample Required"
+  - "Machine Parameter Not Confirmed"
+  - "IP Verification Required"
+  - "Platform Rule Verification Required"
+  - "Official Policy Verification Required"
+  - "Account Ownership Verification Required"
+  - "Fulfillment Disclosure Required"
+manufacturing_gate_states:
+  - "PASS TO DESIGN"
+  - "CONDITIONAL PASS"
+  - "FAIL / REQUIRES REDESIGN"
+production_approval_states:
+  - "Concept Only"
+  - "Awaiting Machine Parameters"
+  - "Sample Required"
+  - "Sample Passed"
+  - "Approved for Production"
+  - "Rejected"
+terminal_states:
+  - "VERIFIED_SUCCESS"
+  - "PARTIAL"
+  - "BLOCKED"
+  - "FAILED"
+  - "UNVERIFIED"
+development_readiness_states:
+  - "Concept Candidate"
+  - "Recommended for Sampling"
+  - "Listing-Ready"
+  - "Approved for Production"
+default_design_families: 4
+default_skus_per_family: 5
+allow_lower_count_when_quality_fails: true
+external_publication_requires_explicit_authorization: true
+listing_rules_require_runtime_official_verification: true
+seller_operations_knowledge_last_normalized_through: "2026-08-31"
+seller_operations_official_policy_last_verified: "2026-09-01"
+seller_operations_external_changes_require_explicit_authorization: true
+seller_operations_prohibited_automation:
+  - "account purchase, transfer, or takeover"
+  - "identity substitution or KYC circumvention"
+  - "proxy or fingerprint configuration intended to mimic another country"
+  - "payout-owner substitution"
+  - "false ships-from or IP-derived postal code"
+  - "tracking selected to conceal the real fulfillment origin or route"

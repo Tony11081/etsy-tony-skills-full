@@ -1,0 +1,6 @@
+shop,total_sales,sales,period,opened_at,on_etsy_since,country,category,url,fetched_at
+ExactFourMonthShop,665,,all-time,2026-04-03,,US,Home & Living,https://www.etsy.com/shop/ExactFourMonthShop,2026-08-03T00:00:00Z
+NotYetFourMonths,670,,all-time,2026-04-04,,US,Craft Supplies & Tools,https://www.etsy.com/shop/NotYetFourMonths,2026-08-03T00:00:00Z
+YearOnlyCandidate,675,,all-time,,2026,US,Jewelry,https://www.etsy.com/shop/YearOnlyCandidate,2026-08-03T00:00:00Z
+YesterdaySalesOnly,,670,yesterday,2026-04-03,,US,Paper & Party Supplies,https://www.etsy.com/shop/YesterdaySalesOnly,2026-08-03T00:00:00Z
+OutsideSalesRange,681,,all-time,2026-04-03,,US,Accessories,https://www.etsy.com/shop/OutsideSalesRange,2026-08-03T00:00:00Z

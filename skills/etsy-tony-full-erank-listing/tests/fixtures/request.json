@@ -1,0 +1,22 @@
+{
+  "market": "US",
+  "shop_language": "en-US",
+  "product": {
+    "product_type": "rocking chair",
+    "color": "rust orange",
+    "upholstery": "corduroy",
+    "frame": "wood frame",
+    "use_cases": ["nursery", "reading nook"],
+    "dimensions": "unknown"
+  },
+  "category": "Rocking Chairs",
+  "attributes": {
+    "primary_color": "Orange",
+    "room": ["Nursery", "Living room"]
+  },
+  "confirmed_claims": [],
+  "images": [],
+  "current_listing": {},
+  "shop_stats": {},
+  "prohibited_terms": []
+}

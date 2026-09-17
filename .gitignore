@@ -1,0 +1,16 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+*.egg-info/
+.venv/
+node_modules/
+.env
+.env.*
+etsy-output/
+reference-images/
+final-images/
+api-detail.json
+api-price.json
+api-inventory.json
+automation-state.json
+.erank_session.json

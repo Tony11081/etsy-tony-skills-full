@@ -1,0 +1,4 @@
+order_id,country,total,status,carrier,tracking_number,created
+o1,United States,28.50,delivered,USPS,9400000001,2026-06-01
+o2,Canada,15.00,in_transit,USPS,9400000002,2026-06-02
+o3,United States,9.50,pre_transit,USPS,,2026-06-03

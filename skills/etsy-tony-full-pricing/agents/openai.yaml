@@ -1,0 +1,4 @@
+interface:
+  display_name: "Etsy-Tony · 合作定价核算"
+  short_description: "Etsy-Tony 完整版：合作定价核算，完成当前任务并独立核对实际结果"
+  default_prompt: "使用 $etsy-tony-full-pricing，根据我已提供的材料完成合作定价核算，说明实际结果、证据和必要缺口。"

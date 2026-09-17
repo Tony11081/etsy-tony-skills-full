@@ -1,0 +1,4 @@
+interface:
+  display_name: "Etsy-Tony · 15 张商品图"
+  short_description: "Etsy-Tony 完整版：15 张商品图，完成当前任务并独立核对实际结果"
+  default_prompt: "使用 $etsy-tony-full-photo-15，根据我已提供的材料完成15 张商品图，说明实际结果、证据和必要缺口。"

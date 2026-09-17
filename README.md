@@ -89,4 +89,3 @@ $etsy-tony-full-gigab2b-draft 为这个 GigaB2B 商品准备完整 Etsy 草稿�
 - 采用 MIT License；Etsy、eRank、GigaB2B 等名称属于各自权利人，本项目与这些平台无官方隶属关系。
 
 结构参考 DBS 的总入口、专用能力与按需参考资料方式；业务流程来自 Etsy-Tony 的 Etsy 工作实践，没有复制 DBS 的业务内容或品牌。
-

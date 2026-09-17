@@ -1,0 +1,12 @@
+{
+  "name": "Etsy Seller Handbook Knowledge Base",
+  "version": "2026-07-29",
+  "language": "English with Chinese topic aliases",
+  "documents": 945,
+  "chunks": 945,
+  "unique_ids": 945,
+  "source_file": "all_articles.json",
+  "source_scope": "Official All articles directory plus 11 official category indexes",
+  "content_scope": "Titles, index summaries, metadata, categories, official URLs",
+  "full_article_bodies_included": false
+}

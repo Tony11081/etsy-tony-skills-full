@@ -1,0 +1,4 @@
+interface:
+  display_name: "Etsy-Tony · 卖家运营知识"
+  short_description: "Etsy-Tony 完整版：卖家运营知识，完成当前任务并独立核对实际结果"
+  default_prompt: "使用 $etsy-tony-full-seller-operations，根据我已提供的材料完成卖家运营知识，说明实际结果、证据和必要缺口。"
