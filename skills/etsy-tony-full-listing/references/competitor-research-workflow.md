@@ -1,60 +1,56 @@
 # 竞品与 eRank 研究
 
-仅当本轮要求竞品研究、基于竞品合成标题或完整 SEO 审查时读取；普通写作不触发。
+仅当本轮要求竞品研究、基于竞品合成标题或完整 SEO 审查时读取；普通写作不触发。字段名与 `SKILL.md` 一致：未确认事实放 `需要确认的信息`，证据类别用 `seller_confirmed` / `visible` / `competitor_verified` / `erank_sourced` / `inference`。
 
-下列命令和非链接相对路径均以本 Skill 的目录为基准。
+## 竞品指纹与相关性门
 
-## Competitor Fingerprint and Relevance Gate
+请求竞品研究时，对当前商品类目应用本门；不得复用其他商品的类目关键词或匹配假设。
 
-When competitor research is requested, apply this gate to the current product category; never reuse category-specific keywords or matching assumptions from a different product.
+1. 从图片、工作标题和已确认卖家事实建立商品指纹：核心商品身份、买家主要需求、结构或安装方式、材质或工艺、个性化或变体结构、用途、目标买家、风格、可见差异点。每个字段标 `visible`、`seller_confirmed` 或 `unknown`；不得把假设当匹配打分。
+2. 从适用的指纹维度生成 2-4 个聚焦的 Etsy 搜索：核心商品 + 结构、材质或工艺、个性化或变体、买家需求或用途。不依赖一个宽泛的标题查询。
+3. 每个保留候选必须同时通过两条硬门：`same_core_product: true` 和 `same_primary_buyer_need: true`。目标是实物成品时，数字文件、原材料、不同商品类型或不同买家任务一律剔除，不看热度或总分。
+4. 保留候选按 100 分打分并保留分项：
+   - `core_product`：0-30
+   - `buyer_need`：0-20
+   - `structure_or_mounting`：0-15
+   - `personalization_or_variant`：0-15（不适用个性化时比较等价的选项或配置结构）
+   - `material_or_process`：0-10
+   - `style_or_use_case`：0-10
+5. `80-100` 为 `core`，`60-79` 为 `adjacent`，低于 60 剔除。硬门失败即剔除，即使算术分 ≥60。标题合成或直接采集 eRank 标签前，至少要有 3-5 条独立打开过的 `core` listing。
+6. `core` 不足 3 条时，一次只放宽一个次要维度（颜色、风格、饰面、材质）。不得同时放宽核心商品身份和买家主要需求，不得静默把 `adjacent` 升为 `core`；有界扩展后仍不足 3 条，竞品/标题依据报 `PARTIAL`。
+7. 同店近似 listing 去重。广告位、Bestseller 徽章、销量、评价、热度可以记录，但不能替代相关性。
+8. 每条保留 listing 都要打开并记录：公开 Etsy URL、精确可见标题、访问时间、分项得分、层级、硬门结果、简要匹配理由、明确不匹配点、描述中的可见事实。搜索结果摘要不算竞品证据。
 
-1. Build a product fingerprint from the images, working title, and confirmed seller facts. Record the core product identity, primary buyer need, structure or mounting, material or production process, personalization or variant structure, use case, target buyer, style, and visible differentiators. Mark each field as `visible`, `seller_confirmed`, or `unknown`; never score an assumption as a match.
-2. Generate 2-4 focused Etsy searches from applicable fingerprint dimensions: core product plus structure, material or process, personalization or variant, and buyer need or use case. Do not rely on one broad title query.
-3. Require both hard-gate fields for every retained candidate: `same_core_product: true` and `same_primary_buyer_need: true`. Reject digital files, supplies, different product types, or different buyer jobs when the target is a finished physical product, regardless of popularity or total score.
-4. Score every retained candidate out of 100 and preserve the component scores:
-   - `core_product`: 0-30.
-   - `buyer_need`: 0-20.
-   - `structure_or_mounting`: 0-15.
-   - `personalization_or_variant`: 0-15; compare the equivalent option or configuration structure when personalization is not applicable.
-   - `material_or_process`: 0-10.
-   - `style_or_use_case`: 0-10.
-5. Classify `80-100` as `core`, `60-79` as `adjacent`, and reject anything below 60. A hard-gate failure is always rejected even if the arithmetic score would be 60 or higher. Keep 3-5 independently opened `core` listings before using competitor evidence for title synthesis or direct eRank tag collection.
-6. If fewer than 3 core competitors remain, expand one secondary dimension at a time, such as color, style, finish, or material. Never relax core product identity and primary buyer need together, never silently promote an adjacent listing, and report the competitor/title basis as `PARTIAL` if bounded expansion still produces fewer than 3 core listings.
-7. Deduplicate near-identical listings from the same shop. Advertising position, bestseller badges, sales, reviews, or popularity may be recorded but never substitute for relevance.
-8. Open every retained listing and record its public Etsy URL, exact visible title, access time, score breakdown, tier, hard-gate result, concise match reasons, explicit mismatches, and visible description facts. Search snippets alone are not competitor proof.
+`core` 竞品用于标题词汇和直接竞品标签证据。`adjacent` 竞品单独列出，只用于定位或需独立验证的关键词想法；不得把它们的语言或标签当作精确竞品证据。
 
-Use `core` competitors for title language and direct competitor-tag evidence. Keep `adjacent` competitors visibly separated and use them only for positioning or keyword ideas that are independently validated; never present their language or tags as exact-competitor evidence.
+## 图片 + 标题竞品流程
 
+用户用商品图片和工作标题请求竞品/eRank 研究时，按下列顺序执行，只读不写。仅有图片和标题不触发本流程。除非用户另行授权外部写入，不编辑或发布 Etsy listing。
 
-## Image + Title Competitor Workflow
+1. 检查全部图片和工作标题，建立初步指纹。区分可见事实与假设；不从图片推断隐藏材质、尺寸、重量、包装内容、生产方式或性能声明。
+2. 建立搜索矩阵，用 Codex 内置浏览器按 `竞品指纹与相关性门` 运行 2-4 个聚焦的 Etsy 查询。可选站点时搜美国站。Etsy 返回验证页或 403 时，用已渲染的 Etsy 页面而不是直接 HTTP。
+3. 打开、打分、分级、去重，直到 3-5 条 `core` 通过，或一次一维的有界扩展用尽。记录每条保留 listing 的必需证据。不把竞品长段文字复制进新 listing。
+4. 汇总竞品证据。复用已确认卖家事实，只对改变商品身份、安全或本次核心结果的缺失事实问一个紧凑问题。相关字段可能包括：
+   - 数量与精确包装内容
+   - 带单位的商品尺寸，需要时含部件尺寸
+   - 净重与包装/运输重量（已知时）
+   - 已确认的材质、颜色、饰面、生产方式
+   - 个性化选项、保养、组装、兼容性或容量声明
+   - 价格、处理时间、发货方式（适用且未确认时）
+   卖家的明确回答是权威商品事实。卖家一旦确认材质、饰面、生产方式、食品接触、安装方式或用途，即可用于准确的标签和文案，即使图片上看不出来。
+5. 只阻塞依赖缺失关键事实的句子，其余继续起草。非关键未知字段直接省略，不必请求许可，放入 `需要确认的信息`。仅当新事实改变相关性时更新指纹并重打分。用已确认事实、适用的采集证据和明确确认的风险声明生成请求的描述；不用占位符绕过关键事实缺口。
+6. 采集 eRank 标签，不需要卖家操作。自动来源顺序：
+   - 先用使用者自己已登录 eRank 的可用浏览器：打开正常的 HTTPS eRank 会员后台，通过 `Look Up Any Listing` 提交每个 Etsy listing URL 或 ID，然后读取 `https://members.erank.com/listing-audit/{listing_id}` 的 13 行。先提交 `core` 竞品 listing。保留精确标签拼写、来源 listing ID/URL、市场，以及 `Unknown`、`-`、`< 20` 等可见值，不估算。关键词搜索量按 [eRank 浏览器读取说明](../../etsy-tony-full-erank-tools/references/keyword-tool-browser.md) 读取 Keyword Tool。
+   - 本地 `etsy-tony-full-erank-tools` harness 仅在使用者已安装并可运行时作补充；可用 `python -m cli_anything.erank --help` 检查命令面。未安装时继续用浏览器或用户导出资料，不依赖作者机器路径，不擅自安装，也不把本地样本当会员实测。
+   - eRank Chrome 扩展侧栏只作可选的视觉交叉核对。会员网页或 CLI 能自动提供同样证据时，不让卖家点 `Copy Tags`、开扩展面板或粘贴剪贴板。
+   - 不查看或暴露 cookie、token、localStorage、sessionStorage、扩展内部或其他凭据。不绕过登录、付费限制、浏览器安全策略或会员配额。自动登录不可用时，报告精确阻塞点而不是索要凭据。
+7. 标签是本次交付物时：去重，删除竞品品牌、商标、无关短语、未确认的材质或工艺，以及超过 20 字符的标签。通过具体的买家意图短语重新引入卖家已确认的属性（如 `acrylic`、`laser cut`、`mirror acrylic`）。`adjacent` 竞品标签单独保存，只作想法，并在已登录的 eRank Keyword Tool 中自动验证准确短语后才可选用。已确认短语不在审计过的 `core` 竞品标签中时，用同一 Keyword Tool 验证并保留 `Unknown`、`-`、`< 20` 等可见值。选恰好 13 个准确标签，一行英文逗号分隔，并过 `SKILL.md` 的 `标签门`（同根 ≤4、不重复类目/属性）。准确的 eRank 标签不足 13 个时，最多再对 `core` listing 做一次聚焦采集，然后报告剩余证据缺口；所有安全的自动 eRank 路径都不可用时，标签步骤报 `BLOCKED` 或整体报 `PARTIAL`，不编造或改标来源。用户跳过标签时，按要求保留或清空 Etsy 标签字段并明确报告状态。
+8. 独立重读最终竞品 URL、得分、层级、硬门结果、已确认事实、生成的标题和描述，以及请求的 13 标签行。核对每个标题的词汇至少来自两条 `core` 竞品标题且未整条复制，并通过 `标题门`（名词一次、<15 词、无礼品短语、无重复词根）。核对 13 标签行通过 `标签门`。描述若用套话开头、缺图标小节、含占位符或省略事实的旁白、引入未确认的场合/选项/效果/安装性能/保养声明，直接退回修改。`core` 与 `adjacent` 证据分开报告；生成的内容不是 eRank 访问或 Etsy 发布的证明。
 
-Use this ordered, review-only workflow when the user requests competitor/eRank research using product images and a working title. Images and a title alone do not trigger it. Do not edit or publish an Etsy listing unless the user separately authorizes that external write.
+## 竞品标题合成门
 
-1. Inspect every supplied image and the working title, then build the preliminary product fingerprint. Separate visible facts from assumptions; do not infer hidden materials, measurements, weight, package contents, production method, or performance claims from an image.
-2. Build the search matrix and use the Codex in-app browser to run 2-4 focused Etsy queries under the `Competitor Fingerprint and Relevance Gate`. Search the US market when a locale choice is available. Use an already rendered Etsy page instead of direct HTTP when Etsy returns a challenge or 403.
-3. Open, score, classify, and deduplicate candidates until 3-5 core competitors pass the gate or bounded one-dimension-at-a-time expansion is exhausted. Record the required evidence for each retained listing. Do not copy long competitor prose into the new listing.
-4. Summarize the competitor evidence. Reuse confirmed seller facts and ask one compact question only for missing facts that change product identity, safety, or the core requested result. Relevant fields may include:
-   - Quantity and exact package contents.
-   - Product dimensions with units, including component dimensions when needed.
-   - Net item weight and packaged/shipping weight when known.
-   - Confirmed materials, color, finish, and production method.
-   - Personalization options, care, assembly, compatibility, or capacity claims relevant to the product.
-   - Price, processing time, and shipping method when applicable facts have not been confirmed.
-   Treat explicit seller answers as authoritative product facts. Once the seller confirms a material, finish, production method, food-contact claim, mounting method, or use case, allow that fact in accurate tags and copy even when it was not visually provable from the image.
-5. Block only the statements that depend on a missing essential fact; continue independent drafting. Omit nonessential unknown fields without asking permission to omit them, and keep them in `information_to_confirm`. Update the fingerprint and rescore affected candidates only when new facts change their relevance. Generate the requested description from confirmed facts, applicable captured evidence, and explicitly confirmed risky claims; never use placeholders to bypass an essential fact gap.
-6. Collect eRank tags without requiring seller interaction. Use this automated source order:
-   - First inspect and run the local `etsy-tony-full-erank-tools` harness from `../etsy-tony-full-erank-tools/harness`. Confirm its current command surface with `python -m cli_anything.erank --help` before relying on it. Use its read-only live listing or shop-tag commands when they provide source-attributed data. Submit core competitor listings first.
-   - If the harness is missing, broken, or cannot return exact listing tags, continue in the same run with the user's already logged-in Chrome. Open the normal HTTPS eRank member dashboard, submit each Etsy listing URL or ID through `Look Up Any Listing`, then read the 13 rows from `https://members.erank.com/listing-audit/{listing_id}`. Preserve exact tag spelling, source listing ID/URL, marketplace, and visible values such as `Unknown`, `-`, or `< 20` without estimating them.
-   - Treat the eRank Chrome extension side panel as an optional visual cross-check only. Do not make a seller click `Copy Tags`, open an extension panel, or paste clipboard text when the CLI or normal member webpage can supply the same evidence automatically.
-   - Never inspect or expose cookies, tokens, localStorage, sessionStorage, extension internals, or other credentials. Do not bypass login, paid limits, browser security policy, or member quotas. If automated login is unavailable, report the exact blocker instead of requesting credentials.
-7. When tags are part of the requested deliverable, deduplicate the retrieved tags, remove competitor brands, trademarks, irrelevant phrases, unconfirmed materials or production methods, and any tag longer than 20 characters. Reintroduce seller-confirmed attributes such as `acrylic`, `laser cut`, or `mirror acrylic` through specific buyer-intent phrases. Keep adjacent-competitor tags separate; use them only as ideas and validate an accurate phrase automatically in the logged-in eRank Keyword Tool before selection. When a confirmed phrase is absent from the audited core competitor tags, validate it through the same Keyword Tool and preserve visible values such as `Unknown`, `-`, or `< 20`. Select exactly 13 accurate tags and return them on one line separated by English commas. If fewer than 13 accurate eRank tags remain, make at most one additional focused collection from core listings, then report the remaining evidence gap; if every safe automated eRank path is unavailable, report the tag step as `BLOCKED` or the overall package as `PARTIAL` instead of inventing or relabeling tags. When the user skips tags, leave the Etsy tag fields unchanged or empty as requested and report that state explicitly.
-8. Independently reread the final competitor URLs, scores, tiers, hard-gate results, confirmed facts, generated title and description, and any requested 13-tag line. Verify that each generated title combines accurate language from at least two core competitor titles without copying one title in full. Reject and directly revise a description that uses a boilerplate opening, lacks icon-led sections, contains placeholders or omitted-fact commentary, or introduces unconfirmed occasions, options, effects, mounting performance, or care claims. Report core and adjacent evidence separately; generated content is not proof of eRank access or Etsy publication.
-
-
-## Competitor Title Synthesis Gate
-
-- Use only the exact visible titles from 3-5 rescored `core` competitors as the title language pool. Adjacent listings and search-result snippets must not contribute title language.
-- Split the titles into reusable segments: core product noun, confirmed material or finish, personalization type, placement or mounting language, style, and seller-confirmed occasion.
-- Build each English title by combining accurate segments represented across at least two competitor titles with the seller's confirmed facts. Prefer repeated buyer language; do not add a material, use, option, or effect merely because a competitor uses it.
-- Put the strongest repeated product phrase plus a confirmed differentiator in the first 40 characters. Remove duplicated wording and keep the result natural rather than concatenating every keyword.
-- Never copy or lightly punctuate an entire competitor title. Preserve the source URLs, match scores, and tiers, and identify which core competitor titles contributed language during final verification.
+- 只用 3-5 条重打分后的 `core` 竞品的精确可见标题作**词汇池**。`adjacent` listing 和搜索结果摘要不得贡献标题语言。
+- 把标题拆成可复用片段：核心商品名词、已确认材质或饰面、个性化类型、摆放或安装语言、风格、卖家确认的场合。记录哪些片段在至少两条 `core` 标题中重复；重复的买家语言是证据，它周围的结构不是。
+- 每个英文标题由重复片段 + 卖家已确认事实组成，但结构按 `SKILL.md` 的 `标题门`，不按竞品结构：名词一次、客观差异前置、15 词以内、无礼品短语、无主观词、无重复词根、无售卖信息。多数存量竞品标题是堆词式，即使每条 `core` 竞品都这样写，也不复制这种模式。
+- 不因竞品用了某个材质、用途、选项或效果就加进来。从竞品采集到的礼品和场合词汇进标签或属性，除非它是商品本质。
+- 不整条复制或只改标点地复制竞品标题。保留来源 URL、匹配分和层级，最终校验时指出哪些 `core` 竞品标题贡献了词汇。

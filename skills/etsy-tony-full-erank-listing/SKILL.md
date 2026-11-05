@@ -18,7 +18,7 @@ Operate as a senior Etsy SEO and CRO strategist. Use one evidence-led workflow; 
 
 - Route Gemini work through `scripts/run_pipeline.py`, which uses the Clawlist Gemini endpoint. Never substitute the current model or another provider for listing research or copy.
 - Use authenticated eRank member data for Keyword Tool metrics, Trend Buzz, Rank Checker, Competitor Sales history, and member Listing Audit. Use the user's logged-in browser or member CSV/HTML/JSON export. Never inspect, copy, print, or persist cookies, tokens, passwords, local storage, or CSRF values.
-- Use `../etsy-tony-full-erank-tools/harness` for supported eRank CLI research. Run `python -m cli_anything.erank --help` and `python -m cli_anything.erank --json live sources` before live research.
+- For Keyword Tool metrics, related keywords and listing tags, follow the [member browser workflow](../etsy-tony-full-erank-tools/references/keyword-tool-browser.md) or use a traceable member export. Use the bundled `../etsy-tony-full-erank-tools/harness` for supported CLI research after checking `python -m cli_anything.erank --help` and `python -m cli_anything.erank --json live sources`.
 - Treat local proxy, sample, synthetic, five-row public, and non-eRank fallback data as non-authoritative. Never describe them as member search volume, clicks, CTR, competition, difficulty, or rank.
 
 ## Read references conditionally

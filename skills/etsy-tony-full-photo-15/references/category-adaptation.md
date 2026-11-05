@@ -1,163 +1,91 @@
-# Etsy Product-Photo Category Adaptation
+# 类目适配与决策覆盖
 
-Use this reference for every campaign before assigning shot roles. Its purpose is to adapt the evidence and creative direction to the actual product, not to promise that every product needs the same amount of lifestyle imagery.
+每次 campaign 分配角色前读取。目的是把证据与创意方向适配到**当前产品**，而不是承诺每个产品都需要同样多的生活场景。家具专属规则见 [furniture-scale.md](furniture-scale.md)，仅家具尺度产品读取。
 
-## 1. Identify How the Buyer Decides
+## 1. 买家怎么决策
 
-Classify the product by form and select the few decision modes that actually control purchase:
+按形态给产品分类，选出真正控制购买的少数决策模式：
 
-- `appearance`: shape, color, finish, pattern, visual presence;
-- `fit`: worn size, drape, comfort, closure, movement;
-- `scale_or_space`: physical size, capacity, viewing distance, room or wall relationship;
-- `function`: grip, loading, operation, movement, result, access;
-- `compatibility`: connector, model, opening, mount, software, file type, device, or system fit;
-- `installation`: mounting, assembly, placement, orientation, or clearance;
-- `condition`: age, wear, flaws, labels, repairs, patina, completeness;
-- `personalization`: editable area, placement, finished example, option mapping;
-- `contents`: included parts, pages, files, formats, variants, or kit relationships.
+`appearance`（形状、颜色、表面、图案）/ `fit`（穿戴尺寸、垂坠、舒适、闭合、活动）/ `scale_or_space`（尺寸、容量、观看距离、房间/墙面关系）/ `function`（握持、承重、操作、运动、效果、取用）/ `compatibility`（接口、型号、开口、安装、软件、文件类型、设备）/ `installation`（安装、组装、放置、朝向、间距）/ `condition`（年代、磨损、瑕疵、标签、修补、完整度）/ `personalization`（可编辑区域、位置、成品示例、选项映射）/ `contents`（内含部件、页面、文件、格式、变体、套件关系）。
 
-Turn the dominant modes into three to six plain buyer questions. Build the set around answering them. Category names are only routing hints; buyer questions are the actual design input.
+把主导模式转成 3–6 个具体买家问题，写入 `category_adapter.buyer_questions`。每个问题映射到来源证据和回答它的图；无证据的问题保留为缺口。类目名只是路由提示，买家问题才是设计输入。
 
-## 2. Choose the Right Proof
+## 2. 选对证据
 
-Select proof types that answer those questions:
+- 干净主图与完整清单；
+- 类目原生的比例、穿着合身、房间视图或锁定尺寸数字；
+- 部件、连接、闭合、底部、边缘、底面、背面、内部——**仅当来源可见**；
+- 材质、纹理、表面、构造、印刷、雕刻、状态微距；
+- 真实使用、操作、安装、运动、容量、效果——**仅当产品和动作都有支撑**；
+- 用准确选项名做变体与个性化映射；
+- 包装、制作过程、保养、洗后效果、来源、到货状态——**仅当已核实**；
+- 数字产品用文件/页面/格式/兼容性证据，而不是虚构的发货或实物包装。
 
-- clean hero and full inventory;
-- category-native scale, worn fit, room view, or locked numeric dimensions;
-- component, connection, closure, base, edge, underside, back, or inside only when visible in a source;
-- material, texture, finish, construction, print, engraving, or condition macro;
-- real use, operation, installation, movement, capacity, or result only when the product and action are supported;
-- variation and personalization mapping using exact supplied options;
-- packaging, making process, care, wash result, provenance, or delivery condition only when verified;
-- file/page/format/compatibility proof for digital products instead of fictional shipping or physical packaging.
+模板角色缺证据就在写 prompt 前替换。展示更宽的已验证表面，比虚构未见过的背面或机构安全。
 
-If a template role lacks evidence, replace it before prompts are written. A wider view of verified surfaces is safer than inventing an unseen back or mechanism.
+## 3. 决策覆盖与有意复用（所有类目共享的多样性规则）
 
-## 3. Decide Whether People Help
+每张图必须有可核对的 `evidence_source` 和 `information_gain`：相比其他图，这张新增了什么受支持的细节、关系、选项、步骤或使用情境。"premium"、"ownership"、"alternate scene" 这类角色名不构成新增信息。
 
-Human presence is a proof method, not a quota.
+区分三种变化：
 
-Record `human_scale_risk` and `human_presence_budget` before assigning human-containing shots. A high-risk product may have a budget of zero even when the generic 15-shot template mentions human use.
+- **决策相关变化**：不同的可见细节或部件、实际操作步骤、受支持的状态、合身或空间关系、有用的视角/距离、记录在案的状态、实际数字内容。哪些变化重要取决于产品和买家问题。
+- **辅助造型变化**：背景色、台面、装饰、场地名、光线情绪、道具重排。可以支持一张有目的的图，但数它们不能建立新的使用时刻或新证据。
+- **已验证选项变化**：颜色、尺寸、名字、编号、材质等已确认的选择。在一致的布置里有比较价值，是选项证据，不自动算不同场景。用户要求的概念变体保持标为概念，不是可售选项。
 
-- Use a hand for grip, operation, scale, opening, fastening, placement, or tactile interaction.
-- Use a worn or partial-body view for fit, drape, movement, body scale, or access.
-- Use POV for assembly, use sequence, selection, or workspace context.
-- Use implied ownership when a human body would distract but a believable in-progress state adds life.
-- Use no person when identity, components, condition, exact detail, compatibility, or digital contents need cleaner evidence.
+两个检查：图必须新增受支持的买家信息；其视觉处理必须让这一贡献可观察。没有对所有产品适用的场地数、角度数、人数、动作数或变化轴数。
 
-The action must be physically possible, the contact believable, and buyer-critical details unobstructed. Do not add a face or full person merely to make an image feel lifestyle-oriented.
+**有意复用适用于**：匹配光线与框取的已确认颜色/材质/尺寸选项；固定机位让步骤变化清楚的操作序列；一致呈现的不同瑕疵、标记、连接或页面；干净产品视图与使用同一视图的确定性尺寸图。`reuse_reason` 必须写出被比较的选项、变化的步骤、来源细节或新增的测量值；"一致性"、"另一种情绪"、新标题都不够。复用的底图算一个底层构图，不增加独立场景。
 
-## 4. Classify Scene Capacity
+静态产品可以保持静态，单一地点的产品可以留在一个地点，只要各图回答不同的受支持问题。真实使用主张需要可见证据，一个装饰道具不能证明活动或拥有故事。渲染后的逐张与样片墙审查规则见 [final-audit.md](final-audit.md)。
 
-Choose a tier before assigning shot roles:
+## 4. 人物是否有帮助
 
-- `experience_led`: context, use, display, fit, ritual, gifting, identity, or ownership is a major part of why the product is bought. The set should feel lived-in and visually transporting while keeping the product accurate.
-- `balanced`: buyers need both environmental understanding and clean factual proof. Use context to explain scale, workflow, placement, use, or condition rather than adding generic decoration.
-- `proof_led`: compatibility, components, condition, file contents, or technical facts dominate. Use truthful installation, workspace, device, or workflow scenes where useful, but never manufacture emotional lifestyle content to reach a quota.
+人物是证明手段，不是配额。分配含人镜头前先记录 `human_scale_risk` 与 `human_presence_budget`；高风险产品即便模板提到人物使用，预算也可以是零。
 
-Classify the current product, not its broad Etsy category. A decorative hand tool may be `experience_led`; an industrial-looking jewelry component may be `proof_led`. Record the buyer behavior that supports the choice.
+- 手：握持、操作、比例、开合、扣紧、放置、触感互动；
+- 穿着或局部身体：合身、垂坠、运动、身体比例、取用；
+- POV：组装、使用序列、选择、工作台情境；
+- 隐含使用者：人体会分散注意但可信的进行中状态能增加生活感；
+- 无人：身份、部件、状态、精确细节、兼容性、数字内容需要更干净的证据。
 
-## 5. Adapt by Product Family
+动作必须物理可行、接触可信、买家关键细节不被遮挡。不为了"像生活照"加脸或全身。紧凑家具的人物限制（见 furniture-scale.md）不外推到所有小产品：小型可穿戴、手持工具、桌面物件不因尺寸小就按家具处理。
 
-Use the table as a question-and-proof guide, never as a fixed aesthetic template.
+## 5. 场景容量分档
 
-| Product family | Usual starting tier | Dominant questions | Useful proof | Common scene risk |
+分配角色前选档，并记录支撑该选择的买家行为。按当前产品分类，不按宽泛的 Etsy 类目：装饰性手工具可能是 `experience_led`，工业感的首饰配件可能是 `proof_led`。
+
+- `experience_led`：情境、使用、陈列、合身、仪式、送礼、身份或拥有是购买的主要原因。整套应有生活感和视觉带入感，同时产品准确。
+- `balanced`：买家既需要环境理解，也需要干净的事实证据。用情境解释比例、工作流、放置、使用或状态，而不是加泛用装饰。
+- `proof_led`：兼容性、部件、状态、文件内容或技术事实主导。有用时用真实的安装、工作台、设备或工作流场景，但绝不为凑配额制造情绪化生活内容。
+
+## 6. 按产品家族适配（问题与证据指南，不是美术模板）
+
+| 产品家族 | 常见起始档 | 主导问题 | 有用证据 | 常见场景风险 |
 | --- | --- | --- | --- | --- |
-| Wearable and soft goods | experience-led | fit, scale, drape, texture, closure, movement | worn view, front/back when sourced, fabric macro, natural motion | invented body fit, hidden closure, unsupported care claims |
-| Jewelry and small accessories | experience-led or balanced | worn scale, clasp/back, material, engraving, gifting | macro, worn crop, closure view, scale cue, verified package | oversized product, fake stones/metal, generic ring-box luxury |
-| Home decor and wall products | experience-led | room scale, viewing distance, installation, finish | room view, wall/surface relationship, close texture, verified mount | impossible mounting, invented dimensions, generic empty-room mockup |
-| Furniture and large objects | experience-led for residential use; balanced when construction, condition, or compatibility dominates | footprint, capacity, construction, clearance, comfort, daily use | room context, lived-in use, multiple distances, joints, doors/drawers when sourced | empty showroom staging, wrong scale, floating object, architecture overpowering product |
-| Tools, kitchenware, and functional goods | balanced | grip, operation, parts, result, cleaning, storage | action sequence, component inventory, contact points, verified result | unsafe use, physically impossible grip, staged gifting replacing function |
-| Personalized, event, and gift products | experience-led | finished personalization, option mapping, occasion use, included items | completed sample, legible detail, real interaction, verified packaging | invented names/options, unrelated occasion styling, filler props |
-| Craft, art, vintage, and one-of-a-kind goods | balanced | authenticity, surface, condition, flaws, provenance, uniqueness | front/side/detail, labels or underside when sourced, condition map | AI restoration, removed flaws, fabricated history, repeated generic studio scenes |
-| Digital and print-on-demand products | balanced or proof-led | file contents, format, compatibility, print placement, actual base item | page/screen previews, exact file list, accurate device or base-product mockup | implying physical delivery, invented files, inaccurate print size or base product |
-| Kits and multi-piece sets | balanced | what is included, part relationship, sequence, storage | full inventory, individual parts, assembled/use state, scale | missing or extra parts, showing accessories as included, repetitive full-set poses |
+| 可穿戴与软货 | experience-led | 合身、比例、垂坠、纹理、闭合、运动 | 穿着视图、有来源的前后视图、面料微距、自然运动 | 虚构合身、隐藏闭合、无支撑的保养主张 |
+| 首饰与小配件 | experience-led / balanced | 佩戴比例、扣/背面、材质、雕刻、送礼 | 微距、佩戴裁切、闭合视图、比例线索、已核实包装 | 产品放大、假宝石/金属、泛用戒指盒奢华感 |
+| 家居装饰与墙面产品 | experience-led | 房间比例、观看距离、安装、表面 | 房间视图、墙面/台面关系、纹理近景、已核实的安装 | 不可能的安装、虚构尺寸、泛用空房间 mockup |
+| 家具与大件 | 见 furniture-scale.md | 占地、容量、构造、间距、舒适、日常使用 | 房间情境、有人住过的使用、多距离、有来源的接缝/门/抽屉 | 空展厅、错误比例、悬浮、建筑压过产品 |
+| 工具、厨具、功能品 | balanced | 握持、操作、部件、效果、清洁、收纳 | 动作序列、部件清单、接触点、已核实效果 | 不安全使用、不可能的握法、送礼摆拍取代功能 |
+| 个性化、活动、礼品 | experience-led | 成品个性化、选项映射、场合使用、内含物 | 成品样例、清晰细节、真实互动、已核实包装 | 虚构名字/选项、无关场合造型、填充道具 |
+| 手工、艺术、复古、独品 | balanced | 真实性、表面、状态、瑕疵、来源、独一性 | 前/侧/细节、有来源的标签或底面、状态图 | AI 修复、抹去瑕疵、编造历史、重复的泛用棚拍 |
+| 数字与 POD | balanced / proof-led | 文件内容、格式、兼容性、印刷位置、实际底品 | 页面/屏幕预览、准确文件清单、准确设备或底品 mockup | 暗示实物发货、虚构文件、印刷尺寸或底品失实 |
+| 套件与多件组 | balanced | 内含物、部件关系、顺序、收纳 | 完整清单、单件、组装/使用状态、比例 | 缺件或多件、把配件显示为包含、重复的整套姿态 |
 
-### Furniture lived-in scene adapter
+## 7. 风格来自当前产品
 
-For furniture and furniture-scale products, add `furniture_scene_adapter` to the campaign plan with:
+美术方向依次来自：已验证的产品颜色、材质、形状、图案、年代、表面；主要买家与自然使用情境；可观察品质支撑的市场定位；每个场景要展示的具体时刻。不默认 `luxury`、`cozy`、`minimal`、`rustic`、浅中性色、深绿、胡桃木、大理石、婚礼、节日或礼品化造型；只有当前产品和买家情境支持时才成立。
 
-- `furniture_function_class`: seating, dining/work/coffee table, storage, bedside/console, shelving/display, or another evidence-based class;
-- `primary_room_and_daily_routine`: the natural room and specific routine supported by the product's apparent function;
-- `supported_interactions`: sitting, reaching, working, dining, setting down, retrieving, opening, closing, displaying, passing, or another action justified by the references and product identity;
-- `unsupported_mechanisms`: drawers, doors, extensions, hinges, shelves, load claims, or hidden features that must not be shown because the references do not verify them;
-- `lived_in_shot_plan`: the shot numbers and distinct daily moments intended to pass the lived-in standard;
-- `human_presence_strategy`: direct partial-body use, anonymous hand/POV, implied owner, or a deliberate mix;
-- `owner_trace_strategy`: in-progress evidence that implies a person without turning props into decorative filler;
-- `circulation_and_scale_plan`: how room clearance, approach, reach, seating position, or movement proves believable scale;
-- `empty_showroom_failure_pattern`: the room, prop, camera, and static-product treatment the set must reject.
+生成前，若有最近一次无关产品的 campaign 可比，检查色板、台面、道具家族、动作、光线模式、相机模式、叙事——有三项以上无当前产品证据地延续过来，重写计划。
 
-Also add `compact_furniture_scale_policy` for freestanding residential furniture:
+## 8. 通用性终检（任一为"否"则重写）
 
-- `trigger`: use `locked_dimensions` when confirmed width is at most 20 in / 50.8 cm or confirmed height is at most 25 in / 63.5 cm. If dimensions are unavailable but the verified product class is clearly a nightstand, side table, stool, or similarly compact cabinet, use `conservative_visual_classification`; otherwise use `not_applicable`.
-- `human_presence_default`: `human_presence_unsafe` when the trigger applies.
-- `human_shot_budget`: zero by default. Allow at most one human-containing final image only when that exact interaction answers a decision-critical buyer question and the user explicitly requests or approves it.
-- `scale_anchor_plan`: prioritize locked dimensions plus stable room/furniture anchors such as a bed or mattress edge, chair, doorway, baseboard, floorboards, or verified room clearance. Do not use hands, phones, or small books as the primary scale anchor for triggered products.
-- `human_probe_required`: true only when the one-shot exception is approved. The probe must precede every other human-containing image.
-- `probe_fallback`: `implied_owner_presence` or `no_human_needed` for all affected roles.
-- `perceptual_scale_rejectors`: miniature/toy-like first impression, a hand or limb that visually dominates the product, a person closer to the camera than the product, inconsistent body/product perspective, or any user-reported scale discomfort.
-
-When the trigger applies, show no visible human anatomy in the hero, dimension graphic, room-fit/circulation proof, or premium closing image. The default set may contain zero people and still satisfy the mandatory human-use intent through verified drawer/door state changes, a specific just-before/just-after routine, objects being stored or retrieved without a visible body, and other implied-owner evidence. If the approved exception is used, show fingertips only—no palm, wrist, forearm, full person, or foreground limb. Keep the product dominant, prefer a 70–85 mm-equivalent normal-to-short-telephoto view, keep product and fingertips in the same middle-distance plane, and treat roughly 25% of product width as a maximum planning warning for visible hand span rather than a substitute for visual judgment.
-
-If the human probe hits any rejector or the user says the scale feels wrong, set `human_probe_result: reject`, reduce the budget to zero, and replace all planned human shots. Do not generate another human route for the same product merely to satisfy a template.
-
-Classify ordinary residential furniture as `experience_led` when room fit, comfort, daily ritual, display, or ownership is a major purchase driver. Use `balanced` when construction, condition, collectible value, component proof, installation, or compatibility genuinely dominates; do not choose it merely because the product is large.
-
-For a 15-image residential-furniture set:
-
-- `experience_led` furniture needs at least four actual lived-in images, including at least one function proof or verified product-state change, one in-progress routine or transition, and one scale/circulation relationship; at least one must appear among the first five;
-- `balanced` furniture needs at least three actual lived-in images when normal residential use can be shown truthfully, including at least one function proof, verified state change, or in-progress routine;
-- count the rendered result, not the planned label. If the image shows only an untouched product in a decorated room, reclassify it as contextual evidence without lived-in proof and replace it when the floor is missed.
-
-The lived-in floor never requires visible people. For a triggered compact product, meet it entirely through supported state changes and specific owner traces when needed.
-
-Adapt moments to the verified furniture function:
-
-- seating: a believable sit, reach, read, converse, stand-up transition, or recently occupied state with correct body scale, contact, weight, and cushion/fabric response where applicable;
-- dining, coffee, and work tables: a specific activity underway, such as working, serving, gathering, sorting, or setting something down, with hands/objects placed in a functional relationship rather than a centered décor arrangement;
-- storage furniture: putting away, choosing, or retrieving an item only when the relevant door, drawer, shelf, or opening is visible in the references; otherwise show truthful closed-state placement and circulation;
-- bedside tables and consoles: a credible arrival, departure, bedtime, morning, or everyday-carry transition in which the furniture organizes the moment;
-- shelving and display furniture: selecting, placing, or viewing an object with believable reach and spacing rather than a symmetrical prop wall;
-- large or specialty furniture: emphasize approach, clearance, body scale, movement path, installation relationship, or supported use appropriate to the verified form.
-
-A lived-in image needs a clear moment plus observable evidence such as body contact, hand action, weight, a verified drawer/door displacement, an object mid-use, a pulled seating position, reachable spacing, or a just-before/just-after transition. Flowers, books, cups, throws, plants, rugs, lamps, or a person merely standing and looking at the camera do not create lived-in evidence by themselves.
-
-Do not manufacture life through clutter, fake wear, unverified children/pets, exaggerated mess, full-face stock models, or yellow/orange grading. Lived-in direction changes the action and spatial relationship, not the product truth or neutral white-balance baseline.
-
-## 6. Build Style From the Current Product
-
-Derive art direction from:
-
-1. verified product color, material, shape, pattern, age, and finish;
-2. the primary buyer and natural context of use;
-3. the intended market position supported by observable quality;
-4. the buyer journey and the specific moment each scene must show.
-
-Do not default to `luxury`, `cozy`, `minimal`, `rustic`, pale neutral, dark green, walnut, marble, wedding, holiday, or gift-ready styling. These directions are valid only when the current product and buyer context support them.
-
-Before generation, compare the current plan with the most recent unrelated campaign if one is available. If three or more signature elements—palette, surface, prop family, action, lighting pattern, camera pattern, or narrative—have carried over without current-product evidence, rewrite the plan.
-
-## 7. Role-Substitution Examples
-
-- No verified packaging: replace `packaging_and_gifting` with a second decision-critical proof such as closure, capacity, finish, condition, compatibility, or a component relationship.
-- No process evidence: replace `process_or_provenance` with a supported material, construction, variation, or use-state view.
-- No back or inside reference: replace `back_inside_or_structure` with a sourced edge, connection, side profile, or wider inventory view.
-- No exact dimensions: use a truthful category-native scale cue and label the plan `scale_effect`; do not generate numbers.
-- Digital download: replace physical lifestyle, shipping, and packaging roles with contents, page previews, formats, software compatibility, editability, and intended-use previews.
-- Product has no meaningful human use: replace the person shot with condition, parts, compatibility, installation clearance, or another factual proof.
-
-## 8. Final Generalization Check
-
-Reject or rewrite the plan when any answer is `no`:
-
-- Do the first five images answer this product's main purchase questions rather than a generic Etsy checklist?
-- Does every role have source evidence or a clearly documented safe substitution?
-- Is the human-presence choice tied to proof or believable ownership?
-- Does visible human anatomy stay within the declared budget, and does every human-containing image pass perceptual scale without a miniature/toy impression?
-- Are scenes native to how this product is bought, used, worn, displayed, installed, downloaded, or collected?
-- Is the style derived from this product rather than an earlier campaign?
-- Does the declared scene-capacity tier match how this product is actually bought, and does the planned mode count meet that tier without fabricating facts?
-- Would removing the product make each lifestyle image's story noticeably incomplete?
-- Does every additional image add new buyer understanding?
-- For furniture, does the final set meet the declared lived-in floor with supported daily moments rather than empty showroom styling?
-- For compact freestanding furniture, was `compact_furniture_scale_policy` resolved before prompts, and was any failed or user-rejected human route removed rather than retried?
+- 前五张回答的是这个产品的主要购买问题，而不是泛用 Etsy 清单？
+- 每个角色都有来源证据或清楚记录的安全替换？
+- 人物决定与证明或可信拥有绑定，可见人体在预算内且无迷你/玩具感？
+- 场景符合这个产品被购买、使用、穿戴、陈列、安装、下载或收藏的方式？
+- 风格来自这个产品而非上一个 campaign？
+- 场景容量档与实际购买方式匹配，计划的场景数达到该档下限且未编造事实？
+- 拿掉产品后，每张生活图的故事会明显不完整？
+- 每张相似构图都有可观察的信息增益或受支持的比较/序列/测量理由？

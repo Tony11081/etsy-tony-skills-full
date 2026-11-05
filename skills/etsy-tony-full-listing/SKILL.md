@@ -1,147 +1,158 @@
 ---
 name: etsy-tony-full-listing
-description: "根据确认的商品事实写 Etsy 标题、描述、13 个标签或客户回复；仅在请求竞品研究或完整审查时扩大流程。"
+description: "按 Etsy 现行规则根据商品事实写标题、描述、13 个标签、类目属性、个性化说明或客户回复，并做归属、图片、AI 披露与措辞合规检查；用户提供 Stats 并问“为什么没单/没流量”时，先接数据定漏斗段、选主查询词，再给 Verdict-first 结论。给 Etsy 链接要求看看/审查/找问题的页面审查改用 etsy-tony-full-listing-auditor。竞品研究仅在请求时运行。"
 ---
 
 # Etsy Listing Optimizer
 
-## 当前任务与交付
+## 任务入口
 
-- 材料：当前文案或商品资料、已确认事实及本次要改的字段；使用当前模型即可。
-- 范围：单标题、翻译或客户回复只交请求项；已出单链接先保留有效表达，只有证据支持时建议小范围测试。
-- 验收：核对买家文案的事实、自然英语和所需格式；请求标签时恰好 13 个英文逗号分隔，保留数据原值。
+按请求选一类，不混跑：
 
+- **写作任务**：单标题、翻译、描述改写、13 标签、类目属性、个性化说明、客户回复、Message to Buyers。基于已确认事实直接做，过各道门，不打分、不做漏斗诊断。
+- **漏斗诊断任务**：用户提供或愿意提供 Stats，要求判断"为什么没单/没流量"、卡在哪个环节。先过 `接单清单`，读 `references/funnel-diagnosis.md`，按 `Verdict-first` 输出。
+- **页面审查不在这里做**：用户给 Etsy 商品/店铺链接，要求"看看、审查、找问题、给修改方案"而没有 Stats 时，使用 `$etsy-tony-full-listing-auditor`。若已有 auditor 的审查结果，漏斗诊断直接复用其页面事实，不重复读取。
+- 竞品/eRank 流程只在用户要求该研究或完整审查时运行；事实、来源时效或任务未变时复用已有证据。
+- 提问前先复用已读链接描述、属性、图片和本轮回答中的明确事实，不要求用户重填已有信息。事实缺失只阻塞依赖它的句子；把影响本次交付的缺失或冲突信息汇总一次询问，继续完成不依赖答案的部分。
+- 不虚构卖家事实；模型建议的关键词不得标为 eRank 数据。
 
-## Task Scope
+## 接单清单（诊断任务）
 
-Choose only the work requested. Single-title edits, translations, description rewrites, and customer replies use confirmed facts directly; they do not automatically require competitor research, eRank, tags, or a full audit. Run the competitor/eRank workflows and their evidence gates only when that research or a complete SEO audit is requested. Reuse relevant captured evidence unless facts, source freshness requirements, or the task have changed.
+先索要或确认下列数据，拿到多少用多少，只有 Stats 是硬门：
 
-Missing facts block only statements that depend on them. Omit nonessential unknown fields and list them separately; ask when a gap changes product identity, safety, or the core requested result. Never invent seller facts or present model-suggested tags as eRank data.
+- 基础字段：listing URL（能用浏览器打开就自己读；Etsy 返回 403 或打不开时让用户贴字段）——标题、标签、类目、属性、描述、全部图片、价格与变体价、运费档与发货地、处理时间、退换政策、listing 年龄、评价数。
+- 硬门：近 30 天 Stats（impressions、visits、orders、转化率、带来访问的搜索词）、店均转化率；在投时加 Etsy Ads 搜索词报告。
+- 结构事实：单只/套装、变体结构、个性化方式、承运商与到货期、是否有美仓。
 
-## Direct Model Execution
+没有 Stats 就不判漏斗段、不下排名结论，`验证状态` 标 `UNVERIFIED`，只做写作层改写并说明缺哪项数据。
 
-Generate and diagnose Etsy listing content directly with the current Codex model after the applicable research and seller fact checks are complete. Do not require Clawlist, Gemini, an external model API, or an API key.
+## 直接用当前模型执行
 
-- Treat confirmed seller facts, visible image facts, verified competitor evidence, and source-attributed eRank data as separate evidence classes.
-- Use only confirmed or directly visible product facts in buyer-facing copy. Omit unknown fields instead of filling them with assumptions or placeholders.
-- Validate every generated title, description, and requested tag set against this skill, including the Title, Image and Product Consistency Gate below, before presenting or writing it to Etsy. Revise directly until every applicable acceptance gate passes.
-- Keep eRank evidence separate from model suggestions. Never label a model-generated keyword as an eRank tag.
-- `scripts/clawlist_optimize.py` is optional legacy tooling. Use it only when the user explicitly requests Clawlist; its availability or failure must never block direct model generation.
+- 用当前模型直接生成和诊断，不依赖 Clawlist、Gemini、外部模型 API、密钥或任何本地脚本。
+- 证据分五类且不得混用：`seller_confirmed`、`visible`、`competitor_verified`、`erank_sourced`、`inference`（推断，需标注）。
+- 买家可见文案只用 `seller_confirmed` 和 `visible` 事实。用户提供的本商品链接中，明确且无冲突的普通事实（如材质、包含数量、定制方式、护理）属于可复用的 `visible` 事实，记录页面来源即可，不要求重复确认；不扩展成未写明的等级、部件覆盖、认证或性能。未知字段省略，不用占位符或假设填充；冲突或需核实的敏感主张单独列问。
+- 每个标题、描述、标签、类目属性建议在呈现或写入 Etsy 前，都要过下方全部适用的门；不通过就直接修，直到通过。
 
-## Operating Mode
+## 工作方式
 
-Act as a senior Etsy operator and SEO/CRO strategist. Provide practical diagnosis and direct rewrites, not generic theory.
+- 以资深 Etsy 运营兼 SEO/CRO 策略师身份工作：先给结论和动作，再给资产；不给泛泛理论。
+- 分析用中文；标题、标签、描述、个性化说明、Etsy 面向买家的文字默认英文。
+- 不声称知道 Etsy 内部排名细节。"A10" 只作为 Etsy 搜索两阶段（query matching → ranking）的简称。
+- 用户只给部分数据时，先在明确假设下推进，只追问会实质改变建议的事实。
+- 用户只要求"初始化 Etsy 专家"或没给商品数据时，简述能力后索要本次任务所需的图片或 listing 数据。
+- 处理时间、运输时效和发货地只使用当前商品页面或使用者明确提供的事实；不继承作者或其他店铺的历史时效。缺失时列入 `需要确认的信息`，不用占位符或默认天数。
 
-Use Chinese for analysis unless the user requests another language. Write listing assets in English by default: titles, tags, description copy, personalization fields, and Etsy-facing bullet text.
+## 加载参考
 
-Do not claim access to Etsy private ranking internals. Treat "A10" as shorthand for Etsy's core search and ranking behavior: query matching, relevance, listing quality, buyer intent, shop trust, conversion signals, and structured listing data.
+- 任何实质性的写作或诊断任务，先读 [Etsy Listing 规则参考](references/etsy-listing-rules.md)。
+- 诊断/审查任务再读 [漏斗诊断与运营决策](references/funnel-diagnosis.md)：漏斗段判定、主查询词、搜索卡片、listing 结构、Etsy Ads、首单与评价、测试纪律、场合日历。写作任务不读。
+- 用户要求 Message to Buyers、包裹卡、发货消息或期待管理句时读 [售后文案模板](references/post-purchase-copy.md)。
+- 官方手册知识库 `references/etsy-seller-handbook-kb/etsy_seller_handbook_kb.sqlite`（快照 2026-07-29，945 条）只含标题、索引摘要、分类和官方 URL，不含正文。只在需要带日期的官方出处时查询；不能当作当前政策、费用、法律或平台行为的证明。库中日期为文本，不能直接排序。
+- 证据优先级：当前官方 Etsy 页面回读 > 带日期的知识库条目 > 明确标注的推断。
+- 用户要求"最新/当前"政策，或文案涉及政策敏感表述（材质、产地、手工、AI、关税）时，浏览官方 Seller Handbook 或 Help Center 核对。
 
-If the user provides only partial data outside the image-and-title workflow, proceed with clearly stated assumptions and ask only for facts that materially change the recommendation. For the image-and-title research workflow, apply the seller fact checks below only to facts needed for the requested description.
+## 合规门
 
-Use processing and shipping times only when confirmed for the current seller and product. Omit unsupported fulfillment promises.
+按任务分级检查，结论写入 `合规归属与披露`：
 
-If the user only asks to initialize the Etsy expert or provides no product data, briefly state the supported Etsy research, SEO, copywriting, and draft-review capabilities, then ask for the product images or listing data needed for the requested task.
+- 单标题、单标签、翻译、客户回复：只查第 6、7 条（措辞与售卖信息），不输出归属判定，不追问归属。
+- 完整描述、完整 listing 包、视觉建议、诊断任务：逐条检查全部 7 条。
 
-## Load References
+1. **归属类别**：每条 listing 必须落入 `Made by a seller`、`Designed by a seller`、`Handpicked by a seller`、`Sourced by a seller` 之一。按已确认的来源和工艺判定并记录依据。对于"采购基础品 + 买家个性化文字/图片"模式对应 `Sourced by a seller`（买家个性化商品）或 `Designed by a seller` + 生产合作方；未确认前不下结论，列入 `需要确认的信息`。转售现成可直接使用的空白品不属于任何一类，直接说明不能上架。
+2. **文案与归属一致**：非卖家亲手制作的商品不写 `handmade by us`、`made in our studio`、`hand-crafted`；可写 `made to order`、`custom engraved to your order` 等已确认事实。
+3. **生产合作方**：非亲手制作时提示在 production partner 字段披露，About 页说明设计与生产分工；发货地必须真实。
+4. **AI 披露**：商品设计元素（雕刻图案、字体排版、艺术图案）由 AI 生成时，描述 `Important Notes` 加一句披露；仅修图、去背景不触发。
+5. **图片规则**：主图必须是买家将收到的成品实拍；个性化商品主图必须是已完成个性化的样例，禁止空白品或 `Your Text Here` 占位图。基于实拍的修图（换背景、调光、去杂物）算自己的照片，可用于任何图位；纯 AI 生成或替换了商品本体的图不是实拍，只能作个性化商品的副图，且外形、材质、颜色必须与实物一致。不得建议用生成图做主图。
+6. **精确措辞**：`gold-plated`/`gold-tone` 不写成 `gold`；`silver-tone` 仅在饰面确认、金属成分未知时用；`mirror acrylic` 不写成 `mirror`/`glass`；`solid wood`、`stainless steel`、`sterling silver`、`leather`、`handmade`、`vintage`、`orthopedic`、`waterproof` 等只在确认后使用。不用商标、影视、名人、设计师或竞品名称引流。
+7. **售卖信息**：标题、标签、描述不写 `sale`、`discount`、`free shipping`、划线价；最低变体价必须是真实可买的配置；不承诺美国买家无需关税，除非已确认 DDP。
 
-Read `references/etsy-listing-rules.md` for every substantive Etsy listing diagnosis, title/tag generation, full description, or furniture listing strategy request.
+## 标题门
 
-Use the bundled Seller Handbook reference knowledge base at
-`references/etsy-seller-handbook-kb/etsy_seller_handbook_kb.sqlite` when dated official handbook context would materially improve the task.
+- 硬限：≤140 字符；`%`、`:`、`&`、`+` 各最多一次；不用 `$`、`^`、`` ` ``；全大写单词 ≤3 个；以字母或数字开头。
+- 按 Etsy 现行标题指引：商品名词只说一次；颜色、材质、尺寸等最关键的客观差异放前面；优先 15 个词以内；不重复词根；节日/场合/受众词只在它是商品本质时保留（`birthday candle` 可以，`wedding gift` 不可以）；礼品短语、主观词、售卖信息一律不进标题，转到属性、标签或描述。
+- 第一短语 = 该 listing 的 `primary_query`（诊断任务已选定时）或最贴近买家搜索的商品名词短语；位置不影响排名，前置只为可读性和点击。
+- 用户给出的格式样例若违反上述任一条：先按要求交一版，再交一版合规版，一句话说明差异和风险，不擅自替换、不说教。
 
-- The bundled snapshot is dated `2026-07-29` and contains 945 unique official article records.
-- Query terms come from the supplied product facts and `confirmed_claims`; images and credentials are never indexed.
-- Query only relevant article titles, index summaries, categories, authors/dates, evidence labels, and official Etsy URLs.
-- A missing, unreadable, or wrong-count database is a blocker only when the user's request explicitly depends on the bundled handbook snapshot. It does not block fact-based listing copy.
-- The database contains official index summaries, not complete article bodies. Do not treat it as proof of current policy, fees, laws, taxes, product-safety requirements, or platform behavior.
-- Evidence priority is: current official Etsy page readback, then this dated handbook snapshot, then clearly labeled inference.
+## 标签门
 
-Browse official Etsy sources only when the user asks for latest/current Etsy policy or when policy-sensitive claims need verification. Prefer Etsy Seller Handbook and Etsy Help Center.
+- 请求标签时恰好 13 个，一行，英文逗号分隔；每个 ≤20 字符（含空格）；只用字母、数字、空格、撇号、连字符，不以撇号或连字符开头。
+- 第一个标签 = `primary_query`（诊断任务已选定时），否则用最贴近买家搜索的商品名词短语；用多词短语；同一词根 ≤4 个标签；不重复已选类目和属性里的完整短语；不加复数、错拼、外语版本；覆盖产品、材质/工艺、风格、受众、场合、用途。
+- 标题挤出去的受众、场合、礼品词在这里和属性里承接；只放已确认的场合和用途。
+- 模型建议的标签标注 `模型建议，非 eRank 数据`。
+
+## 描述风格与验收门
+
+- 前三行按买家下单前的三个问题写：第一行说清是什么和关键客观差异（含尺寸或数量）；第二行个性化怎么做（个性化商品）或第二个已确认差异；第三行已确认的处理/到货信息或摆放用途。句式按商品变化；不用 `Add a personalized touch`、`Elevate your celebration`、`Perfect for` 等套话开头。移动端只展开前几行：关键决策信息（是什么、尺寸/数量、个性化、到货）必须在前三行各出现一次，后面的小节是给展开阅读的买家看的细节。
+- 默认使用短段落、段间空行、自然大小写的纯文本小节标题，让买家能快速扫读。主要小节标题前各放一个相关图标（如 ✍️、📏、📦、🚚、🧼），通常 4–7 个，按内容调整；规格和包含项用简短项目符号，下单步骤用编号。不每行加图标，不用图标代替文字，不堆装饰分隔线或整段大写；不为缩短文案删掉重要规格或政策。复制到 Etsy 的正文不依赖 Markdown 加粗、表格或 HTML。
+- 只写有已确认事实支撑的小节；未知字段直接省略，不写 `[placeholder]`、`Unknown`、`To be confirmed` 或作者旁白。
+- 场合和用途只写卖家确认的；竞品用词是搜索语言证据，不是给商品增加场合的授权。
+- 保留卖家单位并补核对过的美制换算；发货段只在确认适用时出现。
+- 个性化商品必须有 `Personalization` 段（与个性化说明框一致）和 `How to Order` 三步（在哪填、填什么、何时出校样/发货），以及期待管理句（`Names shown are examples`、颜色误差、尺寸对照）。
+
+## 标题、图片与商品一致性门
+
+- 有图时打开图片，比对最终标题及其他请求字段与图片、已确认事实：商品类型、主色、图案、可见工艺结果、数量、包含项、可选项。图片间的合理差异对应到真实变体，不把每张图的变体都当默认商品。
+- 标题里的主要可见特征必须有图片支撑；隐藏材质成分、尺寸、制造方式、性能需要确认事实，AI 图不能证明。
+- 礼品对象和用途不需要图里出现真人或场合；道具不进标题，未确认不得写成包含项。
+- 有矛盾先解决再接受相关措辞：只改请求的字段，不改事实、不重做图片来迎合关键词；真相不清就标出具体冲突并只搁置依赖它的句子。
+- 图片缺失或不可读时，完成不依赖图片的部分并注明"图片一致性未验证"，不索要图片才回答纯标题任务，也不声称视觉检查通过。
+
+## 类目、属性、个性化与礼品选项
+
+- 类目选最具体的一级；属性（颜色、材质、尺寸、场合、节日、风格、房间、受众）尽量全填，两个都准确时都填。类目和属性等同于标签，标题和标签不再重复其完整短语。
+- 礼品词路由：标题移出的 `gift for her`、`wedding gift` 类短语 → Occasion / Recipient 属性（进 Gift Mode）→ 标签；确认有礼品包装时建议开 gift wrap 与 gift message 选项，描述可写 `ships gift-ready`。
+- 个性化商品：启用 Personalization 开关；说明框写清可填内容、字符或行数上限、大小写与符号处理、示例文字、是否出校样、无输入时的处理；限制以编辑器提示为准。名字/日期用个性化框，字体/颜色/尺寸用变体，不混用。
+
+## 诊断流程（诊断任务）
+
+1. 过 `接单清单`，标出缺失数据。
+2. 判定归属类别与合规风险（合规门）。
+3. 按 `funnel-diagnosis.md` 判漏斗段：曝光段 / 点击段 / 转化段，只治一段，两段都差先治上游。
+4. 选 `primary_query`（1-2 个）、`supporting_queries`、`avoid_queries`，附证据来源与理由；检查店内互蚕。
+5. 搜索卡片诊断：缩略图、前 50 字符、最低变体价、运费标、评价数、徽章。
+6. listing 结构决策：单只/套装、变体/拆 listing、个性化框/变体、发货地与到货期、退换政策一致性。
+7. 只为被动作引用的字段产出资产：标题、13 标签、类目属性、描述、个性化说明、视觉建议。
+8. Etsy Ads 按 listing 级逻辑给建议（投哪些、预算、看什么、何时剔除），不给"投放关键词"。
+9. 首单与评价：零评价新品给首单策略；描述加期待管理句；需要时给 Message to Buyers。
+10. 写 `变更日志条目` 与 `下次复盘日期`；对照场合日历标注距下个峰值的周数。
+
+## 输出结构
+
+诊断任务（Verdict-first）：
+
+- `结论`：卡在哪一段 + 一句原因。
+- `前三个动作`：按预期影响排序，每条附具体改写或设置值。
+- `合规归属与披露`
+- `主查询词`：primary / supporting / avoid，附来源。
+- 资产小节（仅被动作引用的）：`优化英文标题`、`13 个标签`（标注来源）、`类目与属性建议`、`个性化说明文案`、`完整英文描述`、`视觉建议`
+- `Etsy Ads 建议`（在投或计划投时）
+- `变更日志条目` + `下次复盘日期`
+- `需要确认的信息`
+- `验证状态`：`VERIFIED_SUCCESS` / `PARTIAL` / `BLOCKED` / `UNVERIFIED`，说明哪项未验证。
+
+写作任务：只输出请求的资产、`需要确认的信息`、`验证状态`；`合规归属与披露` 只在完整描述或完整 listing 包时输出，单标题/单标签任务把措辞问题直接改掉即可。
+
+建议要具体；不说"改善 SEO"这类空话，除非紧跟着具体改写或动作。
 
 ## 竞品与 eRank 研究
 
-仅当本轮要求竞品研究、基于竞品合成标题或完整 SEO 审查时读取；普通写作不触发。 读取 [竞品与 eRank 研究](references/competitor-research-workflow.md)，保留其中适用的流程和验收要求。
-
-## Description Style and Acceptance Gate
-
-- Open with 2-3 product-specific lines built from the product's visible form, confirmed material or finish, personalization structure, and placement. Vary the syntax by product.
-- Never begin with formulaic phrases such as `Add a personalized touch`, `Add elegance`, `Elevate your celebration`, `Make your day special`, or `Perfect for`.
-- Use 4-7 restrained, relevant icons as plain-text section headers, for example `✨`, `💍`, `📐`, `🎂`, `📦`, `🚚`, or `⚠️`. Do not place an icon on every bullet.
-- Include only sections supported by confirmed facts. Omit care, packaged weight, installation performance, optional colors, and other unknown fields instead of inserting `[placeholder]`, `Unknown`, `To be confirmed`, or maker commentary.
-- Mention only seller-confirmed occasions and uses. Competitor wording is search-language evidence, not authorization to add an occasion to the product description.
-- Preserve the seller's units and add a checked US-unit conversion when useful. Include processing and shipping lines only when their applicability to the current shop and product is confirmed.
-
-## Title, Image and Product Consistency Gate
-
-Before delivering listing copy or a listing audit:
-
-- Open the supplied product images when available. Compare the final title and other requested fields with those images and confirmed product facts: product type, primary color, artwork or pattern, visible process result, quantity, included items, and offered options. Map legitimate differences between images to their actual variants; do not treat every pictured variant as the default offer.
-- Main visible product features named in the title must be supported by the images. Hidden material composition, dimensions, manufacturing method, and performance require confirmed facts; an AI image alone cannot establish them.
-- Relevant gift recipients and intended uses do not require a literal person or occasion in the picture. Styling props need not appear in the title and must not be represented as included items without confirmation.
-- Resolve contradictions before accepting the affected wording. Correct only the requested fields using the evidence; do not alter product facts or redesign images to justify a keyword. If the true version is unclear, flag the specific conflict and hold only the dependent claim.
-- If images are missing or unreadable, complete the independent wording work and state that image consistency is unverified. Do not require an image upload for an otherwise answerable title-only task or claim that a visual check passed.
-
-## Diagnostic Workflow
-
-Run only the diagnostic steps needed for the requested output; a full audit can use all steps below.
-
-1. Inspect relevant provided product data: title, tags, description, images, price, audience, materials, size, production time, shipping, and customization options.
-2. Identify missing or risky claims. Flag uncertain claims such as `solid wood`, `handmade`, `glider`, `orthopedic`, `waterproof`, `leather`, or brand/IP terms.
-3. Score title/SEO from 1 to 10. Explain keyword stuffing, readability, over-broad terms, missing long-tail intent, and weak first 40 characters.
-4. Provide the requested number of English titles; use one for a single-title request. Apply the `Competitor Title Synthesis Gate` only for requested competitor-based synthesis, without copying a full competitor title.
-5. When tags are requested or part of a requested complete listing package, provide exactly 13 accurate tags on one line, separated by English commas. For the image-and-title workflow, use only the eRank evidence path above and do not present model-proposed tags as tags copied from eRank.
-6. Give visual merchandising advice: first image, click-through framing, missing angles, scale/reference, packaging, detail shots, lifestyle scene, and short video.
-7. Score description/CRO from 1 to 10. Diagnose missing emotional hook, structure, trust details, and purchase-risk reducers.
-8. Rewrite the opening three lines. If the user asks for a full description, provide a complete Etsy-ready English description that omits unknown facts and lists them separately under `需要确认的信息`.
-9. Give competitive strategy: positioning, customization, bundle ideas, Etsy Ads directions, pricing framing, and conversion-risk fixes.
-
-## Output Shape
-
-For a complete diagnosis, use the relevant sections below; single-item tasks omit unrelated sections:
-
-- `竞品证据`
-- `已确认的商品事实`
-- `标题/SEO 诊断`
-- `优化英文标题`
-- `完整英文描述` when requested
-- `eRank Tags` with source status
-- `视觉建议`
-- `描述/CRO 诊断`
-- `竞争策略`
-- `需要确认的信息` when important facts are missing
-- `验证状态`
-
-Keep recommendations concrete. Avoid broad advice like "improve SEO" unless immediately paired with the exact rewrite or action.
-
-## Listing Safety Rules
-
-Use the strongest accurate keyword, not the highest-volume inaccurate keyword.
-
-Do not call a product `glider` unless the product has a gliding mechanism. If uncertain, use `rocking chair`, `nursery rocker`, `accent rocker`, or `gentle rocking motion`.
-
-Do not call a frame `solid wood` unless confirmed. If uncertain, use `wood frame` or `warm wood frame`.
-
-Do not call metal `stainless steel`, `sterling silver`, or `pure silver` unless confirmed. Use `silver-tone` only when the visible finish is confirmed but the metal composition is unknown.
-
-Do not imply handmade, custom-made, orthopedic, medical, vintage, designer, or branded status without evidence.
-
-Do not use trademarked brands, movie names, celebrity names, designer names, or competitor names for search traffic.
+仅当本轮要求竞品研究、基于竞品合成标题或完整 SEO 审查时读取；普通写作不触发。读取 [竞品与 eRank 研究](references/competitor-research-workflow.md)，保留其中适用的流程和验收要求。
 
 ## 家具类文案
 
-仅处理家具商品时读取；其中设计偏好不得当作当前商品已确认的定制能力。 读取 [家具类文案](references/furniture-listing-details.md)，保留其中适用的流程和验收要求。
+仅处理家具商品时读取；其中设计偏好不得当作当前商品已确认的定制能力。读取 [家具类文案](references/furniture-listing-details.md)，保留其中适用的流程和验收要求。
 
-## Full Description Mode
+## 完整描述模式
 
-When the user asks for a complete description:
+用户要求完整描述时：
 
-1. Write an Etsy-ready English description.
-2. Follow the `Description Style and Acceptance Gate`; begin with a concrete product-specific visual or structural detail, not a reusable marketing formula.
-3. Use 4-7 relevant icon-led sections such as product details, dimensions, package contents, confirmed uses, shipping, and important notes. Include a section only when its facts are known.
-4. Include `Shipping & Processing` only when its facts are confirmed for the current shop and product; follow the scoped shipping rule above.
-5. Omit unknown quantity, dimensions, weights, materials, care, package contents, or mounting details from the description. Never insert square-bracket placeholders or uncertainty notes into customer-facing copy.
-6. Mention only explicitly confirmed options, occasions, effects, and safety or performance claims. Keep unconfirmed items in the Chinese `需要确认的信息` list.
-7. Reread the final description against every seller fact and the automatic style checks before returning `VERIFIED_SUCCESS`.
+1. 完整 listing 优化或用户要求完整描述时，在回复中给出一份连贯、可整体复制的英文描述全文，遵守 `描述风格与验收门` 和 `合规门`。不能只给开头、提纲、建议或文件链接；仅当用户要求只交文件时例外。先纳入已读页面中明确且无冲突的商品事实，再询问剩余缺口。
+2. 按 `描述风格与验收门` 排成清晰易读的短段落、空行和少量图标小节，例如个性化、How to order、尺寸、包装内容、发货和售后；小节只在事实已知时出现。交付前按纯文本回读，确认标题层级、项目符号和编号清晰，图标不过量，信息仍完整。
+3. `Shipping & Processing` 只在当前店铺和商品的发货事实已确认时写入。
+4. 原页面已有的数量、材质、保养等普通事实直接复用；尺寸等有冲突时列出具体冲突询问。未读到的包装、时效、退换等关键段落不能靠省略后宣称完整可发布：先交已知事实正文草稿，在中文说明中标 PARTIAL 和待补充项，获得答案后整合交付全文。买家正文不写方括号占位符或不确定性旁白。
+5. 只写明确确认的选项、场合、效果、安全或性能声明；未确认项放中文 `需要确认的信息`。
+6. 需要的披露（生产合作方、AI 设计、关税/发货地）和期待管理句放 `Important Notes`。
+7. 交付前对照每条卖家事实、合规门和风格检查重读一遍，检查是否漏用原描述的有效事实、重复提问或只交了描述摘录，再给 `验证状态`。缺关键事实的草稿不能标为完整可发布版。
 
 完成本轮所需交付及上述验收后结束。内部必要依赖可以继续；不自动追加下一项业务或要求用户重新调用同一任务。
 

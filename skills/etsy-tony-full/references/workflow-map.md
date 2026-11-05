@@ -14,8 +14,11 @@
 | 明确要求跨研究、工艺、设计、SKUs 开发 | `etsy-tony-full-product-development` | 一个产品开发主流程，复用通过的上游 gate |
 | 给已审查新品整理英文上架资料 | `etsy-tony-full-launch-pack` | SKU 到文案和选项一致性交接，草稿不等于发布 |
 | 改标题、描述、标签、翻译或客户回复 | `etsy-tony-full-listing` | 小任务直接写；要求研究时再取所需竞品和 eRank 证据 |
+| 给 Etsy 商品或店铺链接做审查 | `etsy-tony-full-listing-auditor` | 核对页面事实、变体、图片、合规和转化，交付有据可查的草稿 |
+| 给 Listing Stats 诊断流量或转化 | `etsy-tony-full-listing` | 用可用数据定位漏斗问题并标明缺口 |
 | 明确要求 eRank + Clawlist Gemini 工具链 | `etsy-tony-full-erank-listing` | 不因提到 eRank 就强迫普通文案用外部模型 |
 | 现有产品的 15 张 Etsy 图，或审查该套图 | `etsy-tony-full-photo-15` | 保留产品；审图不生成。不是平台图片上限说明 |
+| 按参考图改款或迁移设计语言 | `etsy-tony-full-from-reference` | 用自有产品图验收改款，保存可复用的产品视觉档案 |
 | 竞品拍摄研究，并给自己的产品做 15 张图 | `etsy-tony-full-competitor-photo-15` | 两项都需要才选；竞品不能作图像生成参考 |
 | 只给现有产品改一张图或其他数量场景 | `etsy-tony-full-photo-engine` | 共享图片能力；沿用产品事实，不扩展成 15 张 |
 | 蛋糕刀铲刻字设计或把图案放到产品上 | `etsy-tony-full-engraving` | 只动指定雕刻区，以使用者提供的真实产品底图为准 |

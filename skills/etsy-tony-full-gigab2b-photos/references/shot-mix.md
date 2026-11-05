@@ -2,6 +2,8 @@
 
 Use this shot mix after extracting the GigaB2B product title and reference images. Adjust scenes to the actual product category, and use 15 as the default count. A user-requested count overrides this example; adapt the mix without duplicating roles. Human/pet suggestions below are optional and subject to the photography engine's scale and safety checks.
 
+For lifestyle scenes, default to bright, airy photography with neutral daylight and category-appropriate everyday props. Use greenery where it belongs in the scene. Match the product's colors and construction to the source.
+
 1. Clean ecommerce hero on a neutral bright background.
 2. Premium lifestyle scene with one person naturally using or reaching for the product.
 3. Lifestyle scene with a pet or animal only when it fits the product and would not feel random; otherwise use a category-appropriate non-human scale cue.
@@ -15,7 +17,7 @@ Use this shot mix after extracting the GigaB2B product title and reference image
 11. Practical-use photo that shows the buyer why the product solves a need.
 12. Clean catalog angle with minimal props for marketplace listing use.
 13. Construction or rear/underside/open/assembled view when the reference images support it.
-14. Warm lived-in scene with tasteful signs of real use, but no mess or random clutter.
+14. Bright lived-in scene with neutral daylight and a few signs of real use.
 15. Product dimension diagram based on the GigaB2B dimension reference image.
 
 Dimension-shot rules:

@@ -1,13 +1,13 @@
 # Etsy-Tony Skills 完整版
 
-**把选品、产品开发、商品图、英文文案和草稿流程串起来。26 项 Skills，完整开源，不设每次 3 张的入门版限额。**
+**把选品、产品开发、商品图、英文文案和草稿流程串起来。完整版公开提供 28 项 Skills。**
 
 作者：**Etsy-Tony** · 抖音号：**93440780745**  
 想看怎么跟做，或安装后不知道从哪开始：抖音搜索这个号码，私信 **「Skills」**，说明你正在做的商品和卡住的步骤。无需提供账号密码或 API Key。
 
 ## 一条命令安装
 
-需要 Node.js / npm，以及支持 Skills 的 AI 客户端。在终端运行：
+需要 Node.js 22.20+、npm、Git，以及支持 Skills 的 AI 客户端。在终端运行：
 
 ```bash
 npx -y skills add Tony11081/etsy-tony-skills-full -g --all
@@ -19,7 +19,15 @@ npx -y skills add Tony11081/etsy-tony-skills-full -g --all
 npx -y skills add Tony11081/etsy-tony-skills-full -g -a codex --skill '*' -y
 ```
 
-安装后新开一次对话。无需记住 26 个名字，直接输入：
+使用 Gemini CLI 时，在要使用技能的项目目录执行下面的命令。
+
+```bash
+npx -y skills add Tony11081/etsy-tony-skills-full -a gemini-cli --skill '*' -y
+```
+
+Gemini CLI 安装后用 `/skills list` 确认 `etsy-tony-full` 已被发现，再按技能名交办任务。Antigravity CLI 可把命令中的 `gemini-cli` 换成 `antigravity-cli`，安装后用 `/skills` 检查。[Skills CLI 支持的客户端](https://github.com/vercel-labs/skills/blob/main/docs/agents.md)
+
+安装后新开一次对话。在 Codex 中可以直接输入下面的指令。
 
 ```text
 $etsy-tony-full 我是新手，请根据我现有的商品资料，带我完成一项实际工作。
@@ -46,6 +54,10 @@ $etsy-tony-full-design-skus 先做 6 张独立概念图供我选择，再开发�
 
 $etsy-tony-full-listing 这是商品事实和竞品链接，请做完整英文 Listing 草稿及 13 个标签，标明证据与未知项。
 
+$etsy-tony-full-listing-auditor 审查这个 Etsy 商品链接，给出有证据的修改建议和英文草稿。
+
+$etsy-tony-full-from-reference 按参考图改款，保留我自己的产品结构，保存产品视觉档案。
+
 $etsy-tony-full-gigab2b-draft 为这个 GigaB2B 商品准备完整 Etsy 草稿。先交付本地资料，我指定店铺并授权后再保存后台。
 ```
 
@@ -53,11 +65,11 @@ $etsy-tony-full-gigab2b-draft 为这个 GigaB2B 商品准备完整 Etsy 草稿�
 
 | 工作 | 可以交付什么 |
 | --- | --- |
-| 标题与 Listing | 单标题、标签、描述、个性化字段、客户回复草稿、竞品研究与图片转化建议 |
+| 标题与 Listing | 单标题、标签、描述、个性化字段、客户回复草稿、商品页审查与 Stats 漏斗诊断 |
 | 市场与证据 | 竞品 DNA 拆解、eRank 公开/会员导出研究、关键词组合与确定性验证 |
 | 产品开发 | 买家动机、原创方向、设计理论、工艺审查、系列、SKU、定制选项、打样与 QC 记录 |
 | 可视化选款 | 独立概念图、选中款的详细开发、可编辑概念稿与文件验收 |
-| 商品摄影 | 完整 15 图流程、竞品场景学习、按要求数量出图、图片诊断、产品保真和失败续作 |
+| 商品摄影 | 完整 15 图流程、视角与色偏验收、竞品场景学习、图片诊断和失败续作 |
 | 婚礼产品 | 刀铲雕刻设计、雕刻母版到场景图、桌号与名字牌设计 |
 | 定价 | 合作定价模型、利润与广告上限、GigaB2B 草稿公式计算 |
 | 供应链到草稿 | GigaB2B 主商品素材提取、图片生产、本地/外部队列、已授权的后台草稿保存与回读 |
@@ -83,7 +95,7 @@ $etsy-tony-full-gigab2b-draft 为这个 GigaB2B 商品准备完整 Etsy 草稿�
 
 ## 项目说明
 
-- 版本：1.0.0
+- 版本 `1.1.0`
 - 主入口：`etsy-tony-full`
 - [全部能力目录](docs/catalog.md) · [配置说明](docs/setup.md) · [来源与许可](NOTICE.md)
 - 采用 MIT License；Etsy、eRank、GigaB2B 等名称属于各自权利人，本项目与这些平台无官方隶属关系。

@@ -16,7 +16,9 @@
 | [`etsy-tony-full-product-studio`](../skills/etsy-tony-full-product-studio/SKILL.md) | 产品理论与工艺 |
 | [`etsy-tony-full-design-skus`](../skills/etsy-tony-full-design-skus/SKILL.md) | 可视化选款开发 |
 | [`etsy-tony-full-original-product`](../skills/etsy-tony-full-original-product/SKILL.md) | 原创产品方案 |
+| [`etsy-tony-full-from-reference`](../skills/etsy-tony-full-from-reference/SKILL.md) | 参考图改款与产品视觉档案 |
 | [`etsy-tony-full-listing`](../skills/etsy-tony-full-listing/SKILL.md) | Listing 优化 |
+| [`etsy-tony-full-listing-auditor`](../skills/etsy-tony-full-listing-auditor/SKILL.md) | 商品页与店铺审查 |
 | [`etsy-tony-full-erank-listing`](../skills/etsy-tony-full-erank-listing/SKILL.md) | eRank 文案流程 |
 | [`etsy-tony-full-photo-15`](../skills/etsy-tony-full-photo-15/SKILL.md) | 15 张商品图 |
 | [`etsy-tony-full-competitor-photo-15`](../skills/etsy-tony-full-competitor-photo-15/SKILL.md) | 竞品场景研究与出图 |

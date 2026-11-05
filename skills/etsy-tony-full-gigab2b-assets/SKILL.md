@@ -16,7 +16,7 @@ description: "读取指定 GigaB2B 主商品的 SKU 与参考图，准备 Etsy �
 
 Turn a GigaB2B product page into a repeatable Etsy product-photo job:
 
-1. Read the product page in logged-in Chrome and extract the main product `Item Code` / SKU.
+1. Use the user's configured GigaB2B OpenAPI first for product facts and originals. Reuse a verified main-product SKU. For a missing SKU, incomplete API data, or an identity cross-check, use the built-in browser if available, then the user's signed-in Chrome.
 2. Run the bundled OpenAPI script to download product reference images, PDFs/files, API metadata, and a generation handoff folder.
 3. Only when image generation is requested, use the mandatory Chinese Etsy prompt verbatim for the default 15-image set (replace only the count when the user explicitly requests another quantity) with `etsy-tony-full-photo-engine`. A source-preparation request ends after verified references and handoff files.
 

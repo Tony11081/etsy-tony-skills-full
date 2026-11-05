@@ -5,6 +5,10 @@ description: "Run, debug, or extend the local eRank CLI-Anything harness for key
 
 # eRank CLI-Anything
 
+## Keyword Tool and listing tags
+
+For current keyword metrics, related terms, and existing listing tags, use [the member browser workflow](references/keyword-tool-browser.md) with the user's own session, or use a traceable member export. Use the bundled CLI for the commands below after checking that it can run. Sample CLI results do not count as member evidence.
+
 Use the local harness at:
 
 `harness`

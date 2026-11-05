@@ -1,0 +1,4 @@
+interface:
+  display_name: "Etsy Listing Auditor"
+  short_description: "读取 Etsy 链接，审查合规与转化并交付有证据的英文优化草稿"
+  default_prompt: "使用 $etsy-tony-full-listing-auditor 审查这个 Etsy 商品链接，给出中文修改方案和基于商品事实的英文标题、13 个标签、描述及图片建议。"

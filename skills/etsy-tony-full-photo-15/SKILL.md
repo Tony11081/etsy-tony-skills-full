@@ -5,133 +5,130 @@ description: "为用户已有产品制作或审查 15 张 Etsy 商品图，保�
 
 # Etsy Product Photo 15
 
-## 当前任务与交付
+## 何时使用
 
-- 材料：可读且有使用权限的本产品参考图，已知尺寸、变体与本轮制作或审查要求。
-- 范围：制作与仅审图分开；单张或其他数量使用匹配的图片能力，不因本入口存在而凑 15 张。
-- 验收：逐张与原图及事实比较，再审整套的差异和买家问题覆盖；图片交付与 publish_readiness 分别报告。
+- 用户明确要求固定 15 张 Etsy 图，或明确点名本 Skill。
+- 其他张数或单张已有产品图：用 `etsy-tony-full-photo-engine`。新品概念开发：用 `etsy-tony-full-original-product` 或 `etsy-tony-full-design-skus`。
+- 用户只要求审图：走 [final-audit.md](references/final-audit.md) 的「审图模式」，不启动生成流程。
 
+目标不是 15 张好看的换背景图。整套图必须让对的买家认出产品、知道具体买到什么、判断尺寸与材质、选对选项、少产生预期落差。
 
-## Overview
+平台事实（Etsy 帮助中心，2026-09 复核）：单个 Listing 最多 20 张图、2 个视频（3–15 秒、≤100 MB、上传后静音）；首图至少 635 px，建议 ≥2000 px。15 是用户指定的格式，不是平台上限，也不是排名承诺。
 
-Use this skill as the entrypoint only when the user requests the fixed 15-image Etsy set or explicitly chooses this Skill. For another shot count or a single existing-product image, use etsy-tony-full-photo-engine. New-product concept development uses the original-product or Tony entrypoint. The goal is not to create 15 attractive background swaps. The set must help the right buyer identify the product, understand exactly what is sold, judge size and material, choose options, and buy with fewer expectation gaps.
+## 四条不可动的原则
 
-Knowledge baseline: `Etsy 运营知识库 06｜Listing 页面、主图、图片组、视频与转化率 SOP`, V1.0, verified 2026-08-19.
+1. **产品事实门**：只用参考图和用户确认的事实；`Unknown` 保持 unknown，不编尺寸、材质、工艺、内含物、个性化示例、包装、价格、发货、Production Partner。
+2. **发布就绪分级**：每次 campaign 先分类，`concept_only` 可交付但 `publish_readiness=BLOCKED`；`prohibited_or_unlicensed` 直接停止。
+3. **尺寸图确定性叠加**：数字、单位、线条、箭头一律在生图之后用 SVG / HTML-CSS / Pillow 等确定性方法叠加，逐一核对锁定数据；不信任生图模型写字。
+4. **审实际渲染，不信 prompt 标签**：接受任何一张图前，先描述画面里实际看到的，再对照参考图、最相近的一张图、最后才看它的角色和 prompt。文件存在、工具返回成功、场景名不同，都不是通过依据。色偏同理：不凭肉眼（看一批暖图会色适应），用 `scripts/color_cast_check.py` 的测量值判定，规则见 [scene-planning.md 第 3 节](references/scene-planning.md)。
 
-When planning or generating images, load and follow the sibling skill:
+## 必带 prompt
 
-`../etsy-tony-full-photo-engine/SKILL.md`
-
-When rules overlap, this skill supplies the Etsy-specific sequence, publishing-readiness, and conversion safeguards. The sibling skill supplies the full campaign planning, prompt generation, image generation, and fidelity-audit workflow.
-
-## Mandatory Prompt
-
-Every final campaign plan must include this user instruction verbatim:
+每份最终 campaign 计划必须原文包含这段用户指令：
 
 ```text
-我是etsy卖家，根据我提供的产品图，帮我生成15张符合etsy顾客喜欢的产品图，镜头需要有近有远，有大有小，整体要有生活气息，图片需包含产品展示，产品细节展示，产品尺寸效果图，尺寸图不的随意修改和线条叠加错乱，人物使用效果展示，生成时注意产品摆放角度和场景图需多样化，不的集中在某一角度和某一场景展示，你是资深的
-etsy产品设计师，发挥你的设计才能开始设计吧
+我是etsy卖家，根据我提供的产品图，帮我生成15张符合etsy顾客喜欢的产品图，镜头需要有近有远，有大有小，整体要有生活气息，图片需包含产品展示，产品细节展示，产品尺寸效果图，尺寸图不得随意修改和线条叠加错乱，人物使用效果展示，生成时注意产品摆放角度和场景图需多样化，不得集中在某一角度和某一场景展示，你是资深的etsy产品设计师，发挥你的设计才能开始设计吧
 ```
 
-Do not paraphrase, translate, shorten, or replace this prompt. Add the product-truth, category-safety, dimension-safety, Etsy compliance, and reference-fidelity constraints in this skill around it.
+不得改写、翻译、缩短或替换。围绕它叠加本 Skill 的产品事实、类目安全、尺寸安全、Etsy 合规与参考保真约束。对其中两句的解释条款：
 
-The phrase `人物使用效果展示` expresses buyer-use intent; it is not a universal visible-person quota. When the category adapter marks human presence unsafe, category safety overrides visible people while the mandatory prompt remains verbatim in the plan. Record the substitution and satisfy the intent through locked dimensions, architectural or furniture scale anchors, verified product-state changes, or implied-owner evidence.
+- `人物使用效果展示` 表达的是"展示买家使用意图"，不是每张都要有人。类目适配判定人物不安全时，用锁定尺寸、建筑/家具比例锚、已验证的产品状态变化或隐含使用者痕迹来满足该意图，并在计划里记录替换。
+- `发挥你的设计才能开始设计吧` 授权的是**构图、场景、光线、镜头、道具**的创造性；不授权改变产品的几何、比例、轮廓、颜色、材质、部件数量、五金、雕刻、图案或内含物。产品本身不是设计对象。
 
-## Current Etsy Capacity and Scope
+## 产品事实门
 
-- The knowledge baseline says a current Listing can contain up to 20 images and 2 videos. The older limits of 10 images and 1 video are not the operating baseline.
-- This skill still plans exactly 15 image roles because that is the user's requested campaign format; 15 is not Etsy's platform maximum and is not a ranking guarantee.
-- Every image must answer a distinct buyer question or provide distinct proof. Do not pad the set with repeated scenes, angles, or props merely to reach 15.
-- Plan all 15 roles, but place only independently audited `pass` images in the final set. If truth, source evidence, or generation quality blocks a role, report the run as `PARTIAL` or `BLOCKED`; never fill the gap with a misleading or duplicate image.
-- Do not upload, reorder, or edit a live Etsy Listing unless the user separately gives explicit authorization.
-- Do not promise that photos or videos will produce a fixed conversion increase, ranking gain, favorite rate, or order volume.
+规划前至少要有一张可读参考图，并查看建立产品事实所需的每一张参考。把**已确认**与**未知**分开记录：
 
-## Input and Product-Truth Gate
+- 身份、类目、结构、比例、部件数量、内含物；
+- 材质、颜色、表面、纹理、构造、五金、缝线、标签、雕刻、图案等买家关键细节；
+- 精确尺寸与单位（若提供）；
+- 可见 Variation 及其面向买家的准确名称；
+- 个性化字段、字数限制、大小写/日期规则、一个已完成的示例（若适用）；
+- 实际包含的包装与配件；用于摆拍或比例但**不包含**的物品；
+- 每张来源是自有实拍、授权买家图、许可 mockup、渲染还是 AI 图；
+- Production Partner / POD 背景（影响哪些 mockup 可接受）；
+- 默认展示版本及其价格（若提供）。
 
-Before planning, require at least one readable reference image and inspect every reference needed to establish product truth.
+## 发布就绪门
 
-Record confirmed facts separately from unknowns:
+分类：`real_product_supported`（有真实成品图，AI 只补场景）/ `permitted_pod_mockup_supported`（原创设计 + 准确的标准底品 mockup）/ `concept_only`（仅渲染、半成品、空白个性化品、无法核实来源）/ `prohibited_or_unlicensed`（竞品图、未授权买家图、失实 mockup）。
 
-- product identity, category, structure, proportions, component count, and included items;
-- material, color, finish, texture, construction, hardware, seams, labels, engraving, artwork, and buyer-critical details;
-- exact dimensions and units, if supplied;
-- visible Variations and their exact customer-facing names;
-- personalization fields, character limits, capitalization/date rules, and a completed sample, if applicable;
-- packaging and accessories that are actually included;
-- items shown for styling or scale that are not included;
-- whether each source is an own real-product photo, authorized customer photo, permitted stock mockup, render, or AI image;
-- Production Partner and POD context when it changes which mockups are acceptable;
-- the pictured/default Listing version and its displayed price, when supplied.
+- 默认以卖家自有真实成品图为最强证据；AI 只能在尺寸、比例、材质、颜色、结构、部件、内含物都不变的前提下换或造场景。不得让整套图都是没有真实成品证据的 AI 场景。
+- Production Partner 制作的实物产品需要真实成品证据，仅有 3D 渲染不算可发布。POD 标准底品可用准确 mockup，但底品、颜色、印刷尺寸与位置、材质必须匹配，并建议先出实物样。
+- 个性化产品的主图必须是已完成的个性化示例；空白品、`Your Text Here`、虚线占位、选项表都不能做主图。已授权的历史样品可用，但要标明是示例而非买家最终成品。
+- 未经用户单独明确授权，不上传、不重排、不编辑在线 Listing。不承诺固定的转化率、排名、收藏或订单提升。
 
-Preserve `Unknown` as unknown. Do not invent dimensions, materials, processes, inclusions, personalization examples, packaging, prices, shipping promises, or Production Partner facts.
+## 精简计划 schema
 
-## Publishing-Readiness and Mockup Gate
+计划保存为 `plan.codex-direct.json`。字段值要能被审计者证伪；写成 "adds detail"、"three-quarter view" 这类无法核对的话等于未填。
 
-Classify the campaign before generation:
+**计划级必填**
 
-- `real_product_supported`: real completed-product references exist and generated scenes are supplemental;
-- `permitted_pod_mockup_supported`: an original seller design is shown on an accurate base-product mockup, with the base product and print placement verified;
-- `concept_only`: only renders, incomplete prototypes, blank personalized products, or unverifiable sources exist;
-- `prohibited_or_unlicensed`: competitor imagery, unauthorized buyer/review photos, or a materially inaccurate mockup is involved.
+| 字段 | 内容 |
+| --- | --- |
+| `product_truth` | 已确认事实 + `unknowns` 列表 |
+| `source_classification`, `publish_readiness` | 上节四分类 + `VERIFIED_SUCCESS/PARTIAL/BLOCKED/UNVERIFIED` |
+| `category_adapter` | 6 项：`product_form`、`buyer_questions`（3–6 个具体问题）、`scene_capacity`（experience_led / balanced / proof_led）、`human_presence_budget`（含 `human_scale_risk`）、`role_substitutions`（缺证据的模板角色 → 替代角色）、`restricted_views`（参考图未覆盖、不得虚构的面/状态） |
+| `dimension_data_locked` | 锁定的数字、单位、标签；无尺寸时写 `none` 并选 `scale_effect` 或 `dimension-ready_inventory` |
+| `non_included_items` | 摆拍/比例道具中不包含的物品 |
+| `scene_counts` | `scene_bearing`（计划数 / 该档下限）、`plain_background`（计划数 / 预算）；proof_led 且无真实情境时写 `not_applicable` + 原因 |
+| `mandatory_prompt` | 上节原文 |
 
-Apply these rules:
+**按条件必填**：`variation_mapping`（有 Variation 时，选项名 → 证据 → 图）；`furniture_scale`（家具尺度产品，见 [furniture-scale.md](references/furniture-scale.md)）；`color_temperature_exceptions`（任一镜头使用暖光源时）；`human_probe_result`（`human_presence_budget` > 0 且已生成首张含人图后：pass / reject）。
 
-- Default to the seller's own real completed-product photos as the strongest proof.
-- AI may supplement a real product by changing or creating a scene only when product size, proportions, material, color, structure, components, and included items remain accurate.
-- Do not make every Listing image a fictional AI scene with no real completed-product evidence.
-- A unique physical product made by a Production Partner requires real completed-product evidence; a 3D render alone is not publish-ready.
-- An original seller design on a standard POD base product may use an accurate stock mockup, but it must match the actual base item, color, print size, placement, and material. Recommend a real sample before treating the Listing as fully verified.
-- For personalized products, the hero must show a completed personalized example similar to what the buyer will receive. A blank product, `Your Text Here`, `Your Name`, a dotted placeholder, or an option chart cannot be the hero.
-- A previously completed personalized sample may be used when authorized, but the plan must identify it as an example rather than the buyer's exact final personalization.
-- Never use a customer/review image without permission or a competitor's product photo.
-- If the campaign is `concept_only`, assets may be delivered as concepts or drafts, but set `publish_readiness=BLOCKED` and clearly state the missing real-product evidence.
-- If the campaign is `prohibited_or_unlicensed`, stop that route and do not generate or publish derivative assets from the source.
+**每张图 5 个必填**（`shots[15]`）
 
-## Read details for this task
+| 字段 | 要求 |
+| --- | --- |
+| `buyer_question` | 这张图回答哪个具体买家问题 |
+| `view` | 一句话：产品哪个面朝相机、如何转/倾、相机方位与高度、距离与裁切 |
+| `visible_view_cues` | 该视角成立时画面里**可观察到**的证据：透视缩短、哪个已有来源的面变宽/露出、边缘遮挡、支撑/佩戴关系。不写"三分之一侧面"这类不可核对的话 |
+| `evidence_source` | 支撑该视角可见区域与状态的参考图编号 |
+| `information_gain` | 相比其他 14 张，这张新增了什么受支持的买家信息 |
 
-- When planning or replanning the 15-image set, read [campaign roles and category adaptation](references/campaign-role-details.md) and [scene planning and color rules](references/scene-planning-details.md) before the coverage matrix or prompts.
-- Before generating or reviewing individual images, read the applicable hero, technical, dimension, variation, and personalization sections in [image rules](references/image-rule-details.md). Read its video section only for requested video briefs, and its alt-text section for a listing handoff.
-- Before accepting a set or delivering its final audit, read [the Etsy-specific final audit](references/campaign-final-audit.md). Every existing product-truth, fidelity, scene, and publishing-readiness requirement still applies.
-- For an audit-only request, inspect the supplied images and use the relevant image rules and final audit. Do not begin a new generation workflow merely because this skill is loaded.
+**每张图按条件必填**：`reuse_group` + `reuse_reason`（与他图共用构图或底图时，写明比较的选项/步骤/细节/数值）；`scene_anchor`（场景型镜头：地点、产品与环境的接触关系、前中后景）；`human`（出现人体时：裁切、动作、接触点、不得遮挡的细节）；`lived_in`（家具场景）；`warm_light_source`（使用暖光时：光源、局部范围、保持中性的区域）。
 
-## 图片制作流程
+## 按需读取路由
 
-仅在制作或重新规划图片时读取；只审图时使用现有 image rules 和 final audit。 读取 [图片制作流程](references/production-workflow.md)，保留其中适用的流程和验收要求。
+| 时机 | 读取 |
+| --- | --- |
+| 规划 15 个角色、分配视角（每次生产） | [shot-roles-and-views.md](references/shot-roles-and-views.md)、[category-adaptation.md](references/category-adaptation.md) |
+| `scene_capacity` 为 experience_led 或 balanced，且有生成的生活/使用/送礼场景 | [scene-planning.md](references/scene-planning.md) 全文 |
+| 写任何生成 prompt 之前、每批生成之后（所有产品，含 proof_led 与纯棚拍） | [scene-planning.md 第 3 节](references/scene-planning.md)（色温、色板与白平衡门）+ `scripts/color_cast_check.py` |
+| 产品是家具或家具尺度物件 | [furniture-scale.md](references/furniture-scale.md) |
+| 生成或逐张审查前（主图、尺寸、变体、个性化、技术参数） | [image-rules.md](references/image-rules.md)；视频与 alt text 段只在被要求时读 |
+| 制作或重新规划（执行顺序、探针、批次、生图工具） | [production-workflow.md](references/production-workflow.md) |
+| 接受整套或交付最终审计；用户只要求审图 | [final-audit.md](references/final-audit.md) |
 
-## Output
+proof_led 且无生活场景的产品可跳过 scene-planning 第 1、2、4 节，但第 3 节色温门不可跳过。非家具产品不读 furniture-scale。
 
-Save durable outputs under the user-requested or explicitly project-defined directory; otherwise use `./etsy-output`:
+## 生成能力与依赖
+
+- 产品保真、参考范围分离、exact-detail 不变量与 prompt 模板由 `../etsy-tony-full-photo-engine/SKILL.md` 提供；只读其 Non-Negotiables、Exact-Detail Products、Generate directly 三节。该文件不存在时，使用 [production-workflow.md](references/production-workflow.md) 内置的「生成要点」继续，并在报告中注明。
+- 生图工具用当前环境内置的图像生成能力（Codex 为 `image_gen`，Cursor 为 `GenerateImage`）。工具不支持参考图输入或不可用时，保存计划与 prompt，报告 `BLOCKED`，不调用外部 API。
+- 色偏测量与确定性白平衡修正用随 Skill 附带的 `scripts/color_cast_check.py`（依赖 Python 3 + Pillow + numpy，只读本地文件，不联网）。脚本不可运行时，退回逐张肉眼审并在报告里标明 `color_cast_status` 为 `UNVERIFIED`，不得据此声明整套色彩通过。
+
+## 输出
+
+保存到用户指定或项目定义的目录；否则使用当前项目的 `etsy-output/`。
 
 ```text
 <out-dir>/
   plan.codex-direct.json
-  source-manifest.json
-  prompts/
-    shot-01.txt
-    ...
-    shot-15.txt
-  shot-01.png
-  ...
-  shot-15.png
-  alt-text.json
+  source-manifest.json       # 每张参考图：文件名、来源类型（自有实拍/授权买家图/许可 mockup/渲染/AI）、授权状态
+  prompts/shot-01.txt … shot-15.txt
+  shot-NN.png                # 仅 pass 的图；PARTIAL 时缺号保留空缺，不用他图补位
+  rejected/shot-NN-attemptK.png   # 记录有意义的保真失败
+  alt-text.json              # 仅 Listing 交接时
+  color-cast-report.json     # scripts/color_cast_check.py 输出：每张 neutral_b / frame_rb / status，含修正记录
   fidelity-audit.json
-  listing-readiness-audit.json
-  video-01-brief.txt        # only when requested
-  video-02-brief.txt        # only when requested
+  listing-readiness-audit.json    # 含 missing_shots 与原因
+  video-01-brief.txt / video-02-brief.txt   # 仅被要求时
 ```
 
-In the final report, separate:
+最终报告分开列出：核对过的参考与事实；生成与交付的文件；被拒、重生成、参考裁切、缺失的镜头；锁定尺寸数据 vs 仅比例线索；实拍 / mockup / AI / 个性化 / Variation / 授权状态；色偏测量摘要（整套 `median_neutral_b`、borderline/reject 数、做过白平衡修正的镜头与增益、登记的暖光例外）；四个审计状态位（`product_fidelity_status`、`shot_effectiveness_status`、`set_coverage_diversity_status`、`publish_readiness`）；在线 Listing 核验状态；阻塞项与卖家需做的最小动作。
 
-- references and confirmed facts checked;
-- images generated and final files delivered;
-- rejected, regenerated, reference-based, or missing shots;
-- locked dimension data versus scale-only cues;
-- real-photo, mockup, AI, personalization, Variation, and licensing status;
-- asset audit result;
-- live Etsy Listing verification status;
-- blockers and the smallest seller action required.
-
-完成本轮所需交付及上述验收后结束。内部必要依赖可以继续；不自动追加下一项业务或要求用户重新调用同一任务。
+完成本轮交付与验收后结束。不自动追加下一项业务，不要求用户重新调用同一任务。
 
 ## Etsy-Tony 教程与求助
 

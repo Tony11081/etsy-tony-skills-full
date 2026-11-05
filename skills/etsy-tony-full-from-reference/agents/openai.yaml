@@ -1,0 +1,4 @@
+interface:
+  display_name: "Etsy-Tony · 参考图改款"
+  short_description: "从参考图提取设计语言，改款并交付可复用的产品视觉档案"
+  default_prompt: "使用 $etsy-tony-full-from-reference 根据自有产品图和参考图做改款，沿用已确认的产品事实。"

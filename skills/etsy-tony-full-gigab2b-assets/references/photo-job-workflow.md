@@ -6,9 +6,10 @@
 
 ## Workflow
 
-### 1. Read the GigaB2B page
+### 1. Resolve the target SKU
 
-- Open the provided `https://www.gigab2b.com/index.php?route=product/product&product_id=...` link in the user's logged-in Chrome.
+- Use the user's configured OpenAPI for product facts, dimensions, originals, and files. Reuse the verified main-product SKU when available.
+- For a missing SKU, incomplete API data, or an identity check, open the supplied product link in the available built-in browser or signed-in Chrome.
 - If the page is already open, use that tab.
 - If Chrome shows `route=account/login`, stop and ask the user to log in, then continue.
 - Read the visible product title and the main product `Item Code` near the top product summary or the selected product information section.
