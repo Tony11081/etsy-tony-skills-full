@@ -4,7 +4,7 @@
 
 ## 1. 每张图的记录
 
-**必填 7 项**
+**必填 8 项**
 
 | 字段 | 内容 |
 | --- | --- |
@@ -13,7 +13,8 @@
 | `planned_requirement_met` | 计划的 `visible_view_cues`、买家关键内容、距离、动作、空间关系是否真的出现；列出漏掉的项。不假定 prompt 里的度数被达成 |
 | `nearest_comparison` | 最相似的图或组（shot 编号）+ 可见差异；有共用构图时写 `reuse_reason`（实际新增的选项/步骤/来源细节/数值）；无可比图时写 `not_applicable` + 原因 |
 | `information_gain` | 这张图**实际**新增的受支持买家信息 |
-| `color_cast_status` | 来自 `color-cast-report.json` 的 `neutral_b` / `frame_rb` / status + 一句可见证据（哪块白/灰物体是否真的中性）；`wb_corrected` 时附增益；有登记暖光例外时引用 `warm_light_source`。没跑脚本 → 写 `UNVERIFIED`，不写 pass |
+| `color_cast_status` | 来自 `color-cast-report.json` 的 `profile` / `neutral_b` / `frame_rb` / status + 一句可见证据（哪块白/灰物体是否真的干净）；`warm_scene` 镜头另写产品颜色与参考图并排是否一致；`wb_corrected` 时附增益；有登记暖光例外时引用 `warm_light_source`。没跑脚本 → 写 `UNVERIFIED`，不写 pass |
+| `aesthetic_check` | photo-engine 的 art-direction.md 第 7 节：`thumbnail` / `eye_path` / `light` / `color` / `real` 各写 pass 或 fail 加一句可见证据；主图加 `click`（没有竞品主图可比时写 `unverified`）。任一项 fail，该图 verdict 不得为 pass |
 | `verdict` | `pass / borderline / reject` + 理由 |
 
 **按条件必填**
@@ -38,7 +39,8 @@
 - 没有从无关 campaign 继承的色板、道具簇、动作或故事。
 - 实际场景承载数 ≥ 该档下限（proof_led 无情境例外需明确处理）；纯底/棚拍/确定性图数在预算内；坍缩成彩色底的场景已重新分类而非被原谅。`experience_led` 集前五张至少两张场景承载，且任何位置不连续超过两张纯底/信息板。
 - 家具：达到 `lived_in_floor`，前五张至少一张 lived-in，无被装饰道具伪装的空展厅簇；紧凑家具在 `human_presence_budget` 内，用户否决的人物路线已移除。
-- 主图、清单、比较、细节、尺寸底图共享中性色彩准确的基线；样片墙中无未记录的黄/橙偏色或不一致的暖调。以最终文件重跑 `scripts/color_cast_check.py`（替换过任何一张都要重跑）：整套 `median_neutral_b` ≤ 3；无 `reject`；`borderline` 仅限用户明确批准的图；`palette_warm_dominant` 的图不超过登记的暖光例外数（≤ 2），且不含主图/比较/细节/尺寸图；`no_neutral_anchor` 为 0。任一不满足 → `set_coverage_diversity_status` 不得为 `VERIFIED_SUCCESS`。
+- 整套看得出来自 `art_direction` 的同一个视觉世界：光的方向与质地、色板、台面材质、道具卡司一致；没有哪张像从别的产品的 campaign 里拿来的。每张的 `aesthetic_check` 无 fail。
+- 清单、比较、细节、尺寸底图共享中性色彩准确的基线（`true_color`）；`true_color` 整套的主图也在其中。样片墙中无未记录的黄/橙偏色；`warm_scene` 镜头之间暖的程度一致，产品颜色在每张图里都和参考图一样。以最终文件重跑 `scripts/color_cast_check.py`（替换过任何一张都要重跑，`warm_scene` 镜头用 `--warm-shots` 列出）：`true_color` 镜头的 `median_neutral_b` ≤ 3；无 `reject`；`borderline` 仅限用户明确批准的图；`palette_warm_dominant` 的图不超过登记的暖光例外数（≤ 2），且不含证据镜头；`no_neutral_anchor` 为 0；标为 `warm_scene` 的镜头里没有颜色/材质比较、清单、细节、尺寸底图。任一不满足 → `set_coverage_diversity_status` 不得为 `VERIFIED_SUCCESS`。
 - 真实产品证据与许可 mockup 使用满足发布就绪门；关键排除项、尺寸信息、限制没被埋在最后；不暗示未验证的价格、发货、送达、评价或转化主张。
 - 正方形、横向、纵向、移动端裁切下产品可辨。
 - 可选视频简报彼此不同、无声优先、技术合规。
@@ -59,6 +61,6 @@
 
 1. 从用户提供的参考图/产品说明建立 `product_truth`（已确认 + unknowns）和来源分类；用户没给参考图时，只能审整套内部一致性与 Etsy 合规，`product_fidelity_status` 记 `UNVERIFIED`。
 2. 按 category-adaptation.md 第 1 节写 3–6 个 `buyer_questions`，判定 `scene_capacity`；家具产品读 furniture-scale.md。这些是审计基准，记为 `plan_source: reconstructed`。
-3. 逐张按第 1 节记录，其中 `planned_requirement_met` 改为 `buyer_question_served`：这张图服务哪个重建的买家问题，若一个都不服务则记 `none`。`color_cast_status` 同样用脚本测（文件名不是 `shot-*.png` 时把图片路径逐个传给脚本），用户抱怨"太暖"时先给出整套数值再谈感受，并按 scene-planning 第 3 节把原因归到 A 白平衡 / B 色板 / C 暖光源。
+3. 逐张按第 1 节记录，其中 `planned_requirement_met` 改为 `buyer_question_served`：这张图服务哪个重建的买家问题，若一个都不服务则记 `none`。`color_cast_status` 同样用脚本测（文件名不是 `shot-*.png` 时把图片路径逐个传给脚本），用户抱怨"太暖"时先给出整套数值再谈感受，并按 scene-planning 第 3 节把原因归到 A 白平衡 / B 色板 / C 暖光源。`aesthetic_check` 照做；用户说"不好看""没质感""不像 Etsy"时，按 art-direction.md 第 4、5 节逐条指出是光、构图、色、造型还是 AI 痕迹的问题，并说明这个产品和它的买家本该对应什么画面（第 1、2 节加 scene-library 的对应条目）。
 4. 整套按第 2 节检查，跳过"对照计划视角组"，改为按实际构图分组并报告未被任何图回答的买家问题、重复组、场景计数与下限差距。
 5. 报告四个状态位、每张图的 verdict、最小修改建议（哪几张换、换成什么角色）。不生成替代图，除非用户另行要求。
