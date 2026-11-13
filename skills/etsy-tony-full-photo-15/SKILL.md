@@ -5,6 +5,8 @@ description: "为用户已有产品制作或审查 15 张 Etsy 商品图，保�
 
 # Etsy Product Photo 15
 
+**先读 [CHECKLIST.md](CHECKLIST.md)，按它的顺序做。** 本文件和各 references 是细则，到哪一步再读哪一段，不要一次全部读进来。
+
 ## 何时使用
 
 - 用户明确要求固定 15 张 Etsy 图，或明确点名本 Skill。
@@ -128,7 +130,8 @@ proof_led 且无生活场景的产品可跳过 scene-planning 第 1、2、4 节�
   plan.codex-direct.json
   source-manifest.json       # 每张参考图：文件名、来源类型（自有实拍/授权买家图/许可 mockup/渲染/AI）、授权状态
   prompts/shot-01.txt … shot-15.txt
-  shot-NN.png                # 仅 pass 的图；PARTIAL 时缺号保留空缺，不用他图补位
+  shot-NN.png                # pass 的图，以及只有图案微重画（motif_redraw）的 borderline 图；其他失败缺号保留空缺，不用他图补位
+  borderline/shot-NN-attemptK.png # 同一镜头的备选稿（可选）
   rejected/shot-NN-attemptK.png   # 记录有意义的保真失败
   alt-text.json              # 仅 Listing 交接时
   plan-check.json            # scripts/plan_check.py --json 的输出，生成前一次、渲染后 --actual 一次

@@ -90,12 +90,17 @@ The stocking is an ordinary family-size Christmas stocking, 19 inches (48 cm) lo
 
 每张有稳定参照物的图都量一次，结果记在该图的 `scale_status`：
 
-1. 在图上量两条像素长度：产品的长边，参照物上一条已知尺寸的边（两者要在同一纵深）。
+1. 在图上量两条像素长度：产品的长边，参照物上一条已知尺寸的边（两者要在同一纵深）。参照物选**离产品最近、和产品在同一平面、尺寸最稳的那一个**，小东西也算：搁板上的马克杯、书、手都比远处的椅子准。画面里有几个稳定参照物就量几个，都要过。主图也要量，主图最容易被画大。
+   量的时候记坐标而不是凭眼估：给脚本端点坐标和原图，它会画一张标线图 `scale/shot-NN-overlay.png` 存档，审图的人一看就知道量的是哪两段。
 2. 跑脚本：
 
    ```bash
    python scripts/scale_check.py --product-cm 48 --product-px 478 \
      --anchor "mantel height:130-140:680" --anchor "firebox width:80-100:460"
+
+   # 用端点坐标（x1,y1,x2,y2），顺带出标线图
+   python scripts/scale_check.py --product-cm 48 --product-line 352,128,560,640 \
+     --anchor "mug height:9-10:540,185,540,245" --image shot-01.png --overlay scale/shot-01-overlay.png
    ```
 
 3. 按偏差判定：

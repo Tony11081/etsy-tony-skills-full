@@ -13,7 +13,10 @@ the scene implies and compares it with the real size.
 
 Anchor format: NAME:CM:PX or NAME:CM_LOW-CM_HIGH:PX. A range is treated as "any
 real size in this range is plausible", so the product only deviates when its real
-size falls outside the whole implied range.
+size falls outside the whole implied range. PX may also be the segment's end points
+x1,y1,x2,y2 (and the product given as --product-line x1,y1,x2,y2); with --image and
+--overlay the script draws the measured segments on a copy of the image for the audit
+(needs Pillow).
 
 Verdict per anchor: deviation <= 15% pass, <= 30% borderline, otherwise reject.
 The overall verdict is the worst one. Exit code 0 pass, 1 borderline, 2 reject,
@@ -21,11 +24,23 @@ The overall verdict is the worst one. Exit code 0 pass, 1 borderline, 2 reject,
 """
 import argparse
 import json
+import math
 import sys
 
 PASS_DEV = 0.15
 BORDER_DEV = 0.30
 ORDER = {"pass": 0, "borderline": 1, "reject": 2}
+
+
+def parse_length(value):
+    """A pixel length, or end points x1,y1,x2,y2. Returns (length, points or None)."""
+    nums = [float(v) for v in str(value).split(",")]
+    if len(nums) == 1:
+        return nums[0], None
+    if len(nums) == 4:
+        x1, y1, x2, y2 = nums
+        return math.hypot(x2 - x1, y2 - y1), (x1, y1, x2, y2)
+    raise ValueError(f"expected a pixel length or x1,y1,x2,y2, got {value!r}")
 
 
 def parse_anchor(text):
@@ -37,10 +52,27 @@ def parse_anchor(text):
         lo, hi = (float(v) for v in cm.split("-", 1))
     else:
         lo = hi = float(cm)
-    px = float(px)
+    px, points = parse_length(px)
     if not name.strip() or lo <= 0 or hi < lo or px <= 0:
         raise ValueError(f"anchor values must be positive and LOW <= HIGH, got {text!r}")
-    return name.strip(), lo, hi, px
+    return name.strip(), lo, hi, px, points
+
+
+def draw_overlay(image, overlay, product_points, anchors, checks):
+    from PIL import Image, ImageDraw
+    im = Image.open(image).convert("RGB")
+    d = ImageDraw.Draw(im)
+    w = max(2, im.width // 300)
+    if product_points:
+        d.line(product_points, fill=(0, 200, 255), width=w)
+        d.text((product_points[0] + 6, product_points[1] + 6), "product", fill=(0, 200, 255))
+    for (name, _lo, _hi, _px, pts), c in zip(anchors, checks):
+        if not pts:
+            continue
+        colour = {"pass": (0, 220, 0), "borderline": (255, 190, 0), "reject": (255, 40, 40)}[c["status"]]
+        d.line(pts, fill=colour, width=w)
+        d.text((pts[0] + 6, pts[1] + 6), f"{name}: {c['status']}", fill=colour)
+    im.save(overlay)
 
 
 def check_anchor(product_cm, product_px, name, lo, hi, px):
@@ -74,6 +106,9 @@ def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--product-cm", type=float, required=True, help="real length of the measured product side")
     ap.add_argument("--product-px", type=float, help="that side's length in the image, in pixels")
+    ap.add_argument("--product-line", help="that side's end points x1,y1,x2,y2 (instead of --product-px)")
+    ap.add_argument("--image", help="the rendered image, for --overlay")
+    ap.add_argument("--overlay", help="write a copy of --image with the measured segments drawn")
     ap.add_argument("--anchor", action="append", default=[], help="NAME:CM:PX or NAME:LOW-HIGH:PX (repeatable)")
     ap.add_argument("--scene-cm", type=float, help="planning only: real height or width the frame covers")
     ap.add_argument("--json", action="store_true", help="print JSON only")
@@ -97,6 +132,13 @@ def main(argv=None):
             else "ok"
         )
 
+    product_points = None
+    if args.product_line:
+        try:
+            args.product_px, product_points = parse_length(args.product_line)
+        except ValueError as exc:
+            print(str(exc), file=sys.stderr)
+            return 64
     if args.anchor:
         if not args.product_px or args.product_px <= 0:
             print("--product-px is required with --anchor", file=sys.stderr)
@@ -106,10 +148,17 @@ def main(argv=None):
         except ValueError as exc:
             print(str(exc), file=sys.stderr)
             return 64
-        checks = [check_anchor(args.product_cm, args.product_px, *a) for a in anchors]
+        checks = [check_anchor(args.product_cm, args.product_px, *a[:4]) for a in anchors]
         result["product_px"] = args.product_px
         result["checks"] = checks
+        result["product_px"] = round(args.product_px, 1)
         result["scale_status"] = max((c["status"] for c in checks), key=ORDER.get)
+        if args.overlay:
+            if not args.image:
+                print("--overlay needs --image", file=sys.stderr)
+                return 64
+            draw_overlay(args.image, args.overlay, product_points, anchors, checks)
+            result["overlay"] = args.overlay
     elif not args.scene_cm:
         print("give --anchor (with --product-px) or --scene-cm", file=sys.stderr)
         return 64

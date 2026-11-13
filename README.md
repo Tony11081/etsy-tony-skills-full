@@ -95,7 +95,7 @@ $etsy-tony-full-gigab2b-draft 为这个 GigaB2B 商品准备完整 Etsy 草稿�
 
 ## 项目说明
 
-- 版本 `1.5.0`
+- 版本 `1.6.0`
 - 主入口：`etsy-tony-full`
 - [全部能力目录](docs/catalog.md) · [配置说明](docs/setup.md) · [来源与许可](NOTICE.md)
 - 采用 MIT License；Etsy、eRank、GigaB2B 等名称属于各自权利人，本项目与这些平台无官方隶属关系。
