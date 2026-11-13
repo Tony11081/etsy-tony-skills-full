@@ -104,7 +104,7 @@ python scripts/color_cast_check.py <out-dir> --warm-shots 1,7,9,15 --json <out-d
 | 指标 | `true_color` | `warm_scene` |
 | --- | --- | --- |
 | `neutral_b`（中性区 b*） | pass ≤ 3；borderline 3–6；reject > 6 | pass ≤ 8；borderline 8–11；reject > 11 |
-| `frame_rb`（整帧 R/B） | > 1.25 → `palette_warm_dominant`，按 B 处理 | 只记录，不判定 |
+| `frame_rb`（环境 R/B：整帧去掉橙黄色带以外的高饱和像素，红、绿、蓝色产品占满画面不算暖色板） | > 1.25 → `palette_warm_dominant`，按 B 处理 | 只记录，不判定 |
 | `neutral_pct`（中性采样占比） | < 8% → `no_neutral_anchor`，按 B 处理 | < 4% → `no_neutral_anchor`：画面里的白全被染色了，按 A 处理 |
 | 整套 `median_neutral_b`（只算 `true_color` 镜头） | ≤ 3；> 3 说明基线整体偏暖，检查共用的 prompt 措辞 | 不适用 |
 

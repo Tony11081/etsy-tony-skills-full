@@ -25,9 +25,12 @@ Metrics per image
               These are the pixels that should read white / gray.
               b* > 0 = yellow, b* < 0 = blue.
   neutral_a   mean a* of the same pixels. a* > 0 = red/magenta (peach cast).
-  frame_rb    mean(R)/mean(B) over the whole frame. Palette warmth, not white
-              balance: a neutral-WB photo full of wood, linen and gold still
-              scores high here, and buyers still perceive it as "warm".
+  frame_rb    mean(R)/mean(B) over the surroundings: the frame minus strongly
+              colored pixels outside the orange-yellow band, so a red, green
+              or blue product filling the frame is not counted as a warm
+              palette. Palette warmth, not white balance: a neutral-WB photo
+              full of wood, linen and gold still scores high here, and buyers
+              still perceive it as "warm". frame_rb_whole is the raw frame.
   neutral_pct share of pixels used as the neutral sample. Below ~8% the
               neutral_b reading is unreliable (nothing neutral in frame),
               which is itself a palette finding.
@@ -125,7 +128,17 @@ def measure(path: str, max_side: int = 768, profile: str = "true_color") -> dict
     pct = float(m.mean() * 100)
     nb = float(b[m].mean()) if m.any() else float("nan")
     na = float(a[m].mean()) if m.any() else float("nan")
-    rb = float(rgb[..., 0].mean() / max(rgb[..., 2].mean(), 1e-6))
+    rb_all = float(rgb[..., 0].mean() / max(rgb[..., 2].mean(), 1e-6))
+    # Palette warmth is about the surroundings (wood, linen, beige, gold), so strongly
+    # colored pixels outside the orange-yellow band are left out: a red, green or blue
+    # product filling the frame is not a warm palette.
+    chroma = np.sqrt(a * a + b * b)
+    hue = np.degrees(np.arctan2(b, a)) % 360
+    env = ~((chroma >= 30) & ((hue < 35) | (hue > 100)))
+    if env.mean() >= 0.15:
+        rb = float(rgb[..., 0][env].mean() / max(rgb[..., 2][env].mean(), 1e-6))
+    else:  # almost the whole frame is saturated product: fall back to the whole frame
+        rb = rb_all
 
     flags = []
     if pct < th["min_neutral_pct"]:
@@ -147,6 +160,7 @@ def measure(path: str, max_side: int = 768, profile: str = "true_color") -> dict
         "neutral_b": None if np.isnan(nb) else round(nb, 1),
         "neutral_a": None if np.isnan(na) else round(na, 1),
         "frame_rb": round(rb, 2),
+        "frame_rb_whole": round(rb_all, 2),
         "neutral_pct": round(pct, 1),
         "color_cast_status": status,
         "flags": flags,

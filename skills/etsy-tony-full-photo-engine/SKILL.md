@@ -49,15 +49,16 @@ Rules for `openrouter`:
 
 Fidelity rules say what must not change. Art direction decides everything else, and it comes before any scene, prop, or prompt. A beautiful room with a product dropped into it is the failure this gate exists to prevent.
 
-Read [references/art-direction.md](references/art-direction.md), then only the matching product family, occasion, and style entries in [references/scene-library.md](references/scene-library.md). In this order:
+Read [references/art-direction.md](references/art-direction.md), then only the matching product family in [references/composition-library.md](references/composition-library.md) and the matching family, occasion, and style entries in [references/scene-library.md](references/scene-library.md). In this order:
 
 1. **Read the product**: what it is and where it lives, its one signature feature, how its material takes light, its color and value, occasion and season, who gives it to whom, price position.
 2. **Read the Etsy buyer**: who is searching, the moment she pictures after it arrives, what she fears before ordering, what her home looks like.
-3. **Fix one visual world**: light (source, direction, softness, time of day), a three-part palette in which the product is the strongest color or value, two or three surfaces that flatter the product's material, a small fixed cast of props, camera language, and `mood_profile` (`true_color` or `warm_scene`).
+3. **Turn selling points into compositions**: list three to five `selling_points` (personalisation, craft and material, function, specs, occasion), ranked; give each the proof a buyer must see and at least two of the thirteen composition types. Every shot carries one `composition` code and the selling point it proves. A multi-shot set uses at least seven composition types per fifteen shots, no type more than three times, and never two neighbouring shots of the same type.
+4. **Fix one visual world**: light (source, direction, softness, time of day), a three-part palette in which the product is the strongest color or value, two or three surfaces that flatter the product's material, a small fixed cast of props, camera language, and `mood_profile` (`true_color` or `warm_scene`).
 
 Save the result as `art_direction` in the plan (fields in art-direction.md §3). For a single shot, three to five lines are enough. For a multi-shot set, `image_set_strategy.visual_world` and `set_lighting_strategy` restate it and must not contradict it.
 
-Redo the direction when it would suit an unrelated product equally well, when it follows a category habit that the product reading does not support, when the light has no named source, or when the product is not the most eye-catching thing in the planned frame.
+Redo the direction when more than half the shots are the product simply centred in a scene, when a selling point has no shot proving it, when it would suit an unrelated product equally well, when it follows a category habit that the product reading does not support, when the light has no named source, or when the product is not the most eye-catching thing in the planned frame.
 
 ## Non-Negotiables
 
@@ -265,6 +266,16 @@ For ornate handles and relief:
 - Reject generic replacement patterns or subtle part stretching.
 
 Prefer supplied reference detail images for exact macro proof. If a generated fragile detail fails twice, stop regenerating that macro and use a safer reference-based detail image, wider view, or ask the user to approve a conservative alternative.
+
+### Printed artwork and illustrated motifs
+
+Image models redraw dense illustrated artwork a little on every generation: faces, scrollwork, small ornaments inside a printed or embroidered motif. This is a known limit of the tool. It is handled by the rules below, not by retrying until the budget is gone and not by delivering nothing.
+
+- Judge two levels separately. **Product level** must pass: shape, proportions, part count, colors, material, trim, hardware, the personalised text itself, and the motif's position, size, layout, and colors. **Motif micro-detail** (the exact face, the exact curl of a scroll, the bead count on a crown) is recorded as `motif_redraw`.
+- A shot whose only defect is `motif_redraw` is `borderline`, never `reject`. Generate it at most twice, keep the better file, list the visible differences in the audit, and place it in `borderline/`. A shot must never end with no file.
+- Decide once per campaign how exact motif proof is supplied, and record it as `motif_proof`: a real photo or a crop of a supplied reference used as the close-up; or the supplied flat artwork shown as its own deterministic image (option tile, artwork detail); or the user's approval of `motif_redraw` at the distances where the motif is small.
+- Never generate a macro whose subject is the artwork itself. That close-up comes from a real photo or a reference crop.
+- State how the artwork and text are made, in the lock block of every prompt: a print or heat transfer is `a flat print, not embroidery, no raised relief`; embroidery is named as embroidery. An image that turns a print into embroidery or relief misstates the product and is `reject`.
 
 ## Planning and Generation Workflow
 

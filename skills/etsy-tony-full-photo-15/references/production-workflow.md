@@ -5,7 +5,7 @@
 ## 1. 工作流
 
 1. 查看全部所需参考，完成 SKILL.md 的产品事实门与来源分类。
-1a. 读 `../etsy-tony-full-photo-engine/references/art-direction.md`，再读同目录 `scene-library.md` 里对得上的产品家族、场合、风格条目，写 `art_direction`：读懂产品 → 读懂买家 → 定视觉世界（光、色板、台面、道具卡司、镜头、`mood_profile`）。`buyer_reading.worry` 进入下一步的 `buyer_questions`。这一步不分配每张图的场景，只定整套的世界。
+1a. 读 `../etsy-tony-full-photo-engine/references/art-direction.md`，再读同目录 `scene-library.md` 里对得上的产品家族、场合、风格条目，写 `art_direction`：读懂产品 → 读懂买家 → 按同目录 `composition-library.md` 列卖点、给每张图配构图 → 定视觉世界（光、色板、台面、道具卡司、镜头、`mood_profile`）。`buyer_reading.worry` 进入下一步的 `buyer_questions`。这一步不分配每张图的场景，只定整套的世界。
 2. 读 [category-adaptation.md](category-adaptation.md) 与 [shot-roles-and-views.md](shot-roles-and-views.md)：写 `category_adapter`（6 项），把 15 个角色映射到买家问题与来源证据，完成每张图的 `view` / `visible_view_cues` / `evidence_source` / `information_gain`，通过视角预检。**在选装饰环境或写 prompt 之前保存这些。**
 3. 若 `scene_capacity` 为 experience_led / balanced 且有生活场景，读 [scene-planning.md](scene-planning.md)：在 `art_direction` 的视觉世界之内，围绕已分配的视角设计各镜头的时刻与 `scene_anchor`，填 `scene_counts`，检查前五张混合与序列门。家具产品读 [furniture-scale.md](furniture-scale.md) 并填 `furniture_scale` 与每张的 `lived_in`。
 4. 填 `publish_readiness`、`dimension_data_locked`、`non_included_items`，有 Variation 时填 `variation_mapping`。
@@ -56,6 +56,8 @@
 - 参考图是**产品真实**的唯一来源，不是场景真实的来源。先写 `product_truth_from_reference`（必须精确保留的一切）和 `reference_scene_to_ignore`（背景、台面、道具、光线、裁切、排列）。除非用户要求或安全/细节镜头需要，不复制参考场景。
 - 绝不重设计结构、比例、轮廓、颜色、材质、缝线、五金、接口、logo、雕刻、印刷、浮雕或内含物；无镜像、变形、缺件、加件或买家关键裁切。
 - exact-detail 产品（个性化、名字、日期、logo、雕刻/印刷艺术、密集浮雕、缝线、五金、孔位、形状敏感部件）先写可测量的 `reference_invariants`：部件数与关系、各部件长宽比、雕刻文字/位置/字体/所在面、图案类型/密度/边界、五金/缝线/孔/边缘位置、材质/表面/颜色。每个相关 prompt 点名脆弱细节；"preserve details" 一句不够。脆弱细节生成失败两次后停止重试该微距，改用参考裁切、更宽视角，或请用户批准保守替代。
+- **印花、刺绣、插画类图案会被生图模型重画一点**（脸、卷纹、小装饰），这是工具的已知局限。分两层判：产品层（形状、比例、部件、颜色、材质、饰边、定制文字本身、图案的位置大小布局配色）必须通过；图案微细节的偏差记 `motif_redraw`。只有 `motif_redraw` 一个问题的图判 `borderline` 而不是 `reject`：最多生成两次，留较好的一张放进 `borderline/`，在审计里写清看得见的差异，**不允许一张图最后没有文件**。图案的精确证据按计划里的 `motif_proof` 另行提供；以图案本身为主体的微距一律用实拍或参考裁切，不生成。
+- 锁定段写明图案和文字的做法：印花或转印写 `a flat print, not embroidery, no raised relief`。把印花画成刺绣或浮雕是对产品的错误描述，判 `reject`。
 - 不加文字、水印、logo、脸、角标、箭头、标签或信息图元素（除非明确要求）。
 - 每个镜头一次生图调用，不合并。每张选 2–4 张原始参考：一张干净完整视图 + 只为证明该镜头脆弱不变量所需的细节视图。不超过工具参考图上限，不用拼图绕过。每次重试保留硬不变量。
 

@@ -2,6 +2,8 @@
 
 写 `art_direction` 时读取。先读完 [art-direction.md](art-direction.md) 第 1、2 节，带着 `product_reading` 和 `buyer_reading` 来这里选：**一个产品家族 + 一个场合（如果有）+ 一种风格**，把选择记在 `art_direction.library_entry`。
 
+画面拍成什么构图（单品、成排、上手、使用中、平铺、近景……）在 [composition-library.md](composition-library.md)，按卖点去选；本文件只管在哪拍、什么光、什么颜色。
+
 这是起点，不是模板。每一条都要用当前产品过一遍：`product_reading` 里找不到依据的线索删掉，产品有而这里没写的特点补上。只需要读对得上的那一条家族和用到的场合、风格，不用通读。找不到对应家族时，按 art-direction 第 1 到 4 节自己推一条，同样写进 `art_direction`。
 
 所有条目都受保真和事实规则约束：道具不暗示包含在内，不虚构包装、工艺和尺寸，人物只在预算内出现。

@@ -9,7 +9,7 @@
 | 字段 | 内容 |
 | --- | --- |
 | `observed` | 读角色前先写：画面里实际有什么——产品哪个面朝相机、相机方位/高度、距离、产品状态或动作、与环境的接触、背景实际模式 |
-| `fidelity` | 对照参考与锁定事实：结构、比例、部件数、材质、颜色、五金、图案、文字、内含物；`pass / borderline / reject` + 理由 |
+| `fidelity` | 对照参考与锁定事实：结构、比例、部件数、材质、颜色、五金、图案、文字、内含物；`pass / borderline / reject` + 理由。只有图案微细节被重画（`motif_redraw`）记 `borderline` 并列出差异；印花被画成刺绣或浮雕记 `reject` |
 | `planned_requirement_met` | 计划的 `visible_view_cues`、买家关键内容、距离、动作、空间关系是否真的出现；列出漏掉的项。不假定 prompt 里的度数被达成 |
 | `nearest_comparison` | 最相似的图或组（shot 编号）+ 可见差异；有共用构图时写 `reuse_reason`（实际新增的选项/步骤/来源细节/数值）；无可比图时写 `not_applicable` + 原因 |
 | `information_gain` | 这张图**实际**新增的受支持买家信息 |
@@ -39,6 +39,7 @@
 - 没有从无关 campaign 继承的色板、道具簇、动作或故事。
 - 实际场景承载数 ≥ 该档下限（proof_led 无情境例外需明确处理）；纯底/棚拍/确定性图数在预算内；坍缩成彩色底的场景已重新分类而非被原谅。`experience_led` 集前五张至少两张场景承载，且任何位置不连续超过两张纯底/信息板。
 - 家具：达到 `lived_in_floor`，前五张至少一张 lived-in，无被装饰道具伪装的空展厅簇；紧凑家具在 `human_presence_budget` 内，用户否决的人物路线已移除。
+- 构图多样：每张都有 `composition` 代号；15 张至少 7 种构图，同一种最多 3 张，相邻两张不同种；远、中、近、特写四档景别都有；`selling_points` 排前三的每条至少有两张不同构图的图在证明；没有两张图只差背景。
 - 整套看得出来自 `art_direction` 的同一个视觉世界：光的方向与质地、色板、台面材质、道具卡司一致；没有哪张像从别的产品的 campaign 里拿来的。每张的 `aesthetic_check` 无 fail。
 - 清单、比较、细节、尺寸底图共享中性色彩准确的基线（`true_color`）；`true_color` 整套的主图也在其中。样片墙中无未记录的黄/橙偏色；`warm_scene` 镜头之间暖的程度一致，产品颜色在每张图里都和参考图一样。以最终文件重跑 `scripts/color_cast_check.py`（替换过任何一张都要重跑，`warm_scene` 镜头用 `--warm-shots` 列出）：`true_color` 镜头的 `median_neutral_b` ≤ 3；无 `reject`；`borderline` 仅限用户明确批准的图；`palette_warm_dominant` 的图不超过登记的暖光例外数（≤ 2），且不含证据镜头；`no_neutral_anchor` 为 0；标为 `warm_scene` 的镜头里没有颜色/材质比较、清单、细节、尺寸底图。任一不满足 → `set_coverage_diversity_status` 不得为 `VERIFIED_SUCCESS`。
 - 真实产品证据与许可 mockup 使用满足发布就绪门；关键排除项、尺寸信息、限制没被埋在最后；不暗示未验证的价格、发货、送达、评价或转化主张。
