@@ -55,6 +55,7 @@ Read [references/art-direction.md](references/art-direction.md), then only the m
 2. **Read the Etsy buyer**: who is searching, the moment she pictures after it arrives, what she fears before ordering, what her home looks like.
 3. **Turn selling points into compositions**: list three to five `selling_points` (personalisation, craft and material, function, specs, occasion), ranked; give each the proof a buyer must see and at least two of the thirteen composition types. Every shot carries one `composition` code and the selling point it proves. A multi-shot set uses at least seven composition types per fifteen shots, no type more than three times, and never two neighbouring shots of the same type.
 4. **Fix one visual world**: light (source, direction, softness, time of day), a three-part palette in which the product is the strongest color or value, two or three surfaces that flatter the product's material, a small fixed cast of props, camera language, and `mood_profile` (`true_color` or `warm_scene`).
+5. **Lock real-world scale**: read [references/scale-realism.md](references/scale-realism.md) and write `scale_lock`: the real size in centimetres and its source, the size class, how big it is against a hand or forearm, at most two size-stable anchors per scene with the product-to-anchor relation, and where the product ends up (what it reaches, what it must not cover). Image models enlarge the product instead of moving the camera closer; the wider the shot, the worse it gets.
 
 Save the result as `art_direction` in the plan (fields in art-direction.md §3). For a single shot, three to five lines are enough. For a multi-shot set, `image_set_strategy.visual_world` and `set_lighting_strategy` restate it and must not contradict it.
 
@@ -69,6 +70,7 @@ Redo the direction when more than half the shots are the product simply centred 
 - Never redesign structure, proportions, outline, color, material, seams, grain, hardware, connectors, logos, engraving, prints, relief, or included items.
 - Keep the full product legible; avoid mirrored structure, distortion, missing parts, added parts, or buyer-critical cropping.
 - Keep the product's own colors true to the references in every shot, with controlled highlights. Scene warmth is allowed only when `art_direction.mood_profile` is `warm_scene`, and then it comes from named light sources in the scene, never from a yellow, amber, or orange cast over the product or the whites.
+- Draw the product at its real size against everything else in the frame. To make it larger in the frame, move the camera closer and crop the room; never enlarge the product. Size comes only from the listing, a measurement, or the user; with no reliable size, shoot only frames that have no scale anchor.
 - Use scenes that come from the art direction for this product. Reject generic clutter or styling that conflicts with buyer intent, natural use, or price positioning.
 - Do not add text overlays, badges, arrows, labels, watermarks, logos, full people, or visible faces unless explicitly requested.
 - Use anonymous hands or partial-body gestures only when they prove scale, use, handling, installation, comfort, or interaction.
@@ -315,7 +317,7 @@ Image models respond to a described photograph, not to a form. Long field lists 
 Product photo for an Etsy listing. The attached reference images are the only source of truth for the product: <name and reference-verified identity>. Keep its <structure, proportions, outline, colors, material, hardware, connectors, engraving, motifs, included items> exactly as in the references<; exact-detail products: name each fragile detail and quote any text verbatim>. Ignore the references' background and lighting.
 
 <SCENE: 4-7 sentences, written the way a photographer would describe the finished frame>
-Where and when. What the product rests on or hangs from and how it touches it. Which face is toward the camera; camera height, distance, and lens feel. Where the light comes from, how soft it is, what the shadows do. The two or three materials and colors around the product, chosen so the product is the strongest color or value in the frame. One trace of real life. Any hand or partial figure: crop, action, contact point.
+Where and when. What the product rests on or hangs from and how it touches it. Scale, whenever a size-stable anchor is in frame: real size in inches and cm, one or two relations to the anchor, where the product ends, and how much of the frame it takes at this camera distance. Which face is toward the camera; camera height, distance, and lens feel. Where the light comes from, how soft it is, what the shadows do. The two or three materials and colors around the product, chosen so the product is the strongest color or value in the frame. One trace of real life. Any hand or partial figure: crop, action, contact point.
 
 <CLOSE: 1-3 sentences>
 Color: <true_color: neutral daylight; name the largest white or gray object and say it renders clean white or neutral gray | warm_scene: name the warm sources and where they sit; state that the light on the product is neutral, name one white object that reads as soft white, and that the product matches the reference colors>. Framing: square with breathing room for 4:5 and landscape crops. Exclusions: only the two or three things this shot is really at risk of (<added text, logos, faces, extra items, a repeated treatment from another shot>).
@@ -325,6 +327,7 @@ Writing rules:
 
 - Describe what the camera sees. No evaluative or quality words (`beautiful`, `luxury`, `stunning`, `cozy`, `8k`, `masterpiece`, `highly detailed`).
 - Name real materials and colors (`white-painted wooden mantel`, not `nice fireplace`). Light always has a source, a direction, and a softness.
+- In scene shots never call the product `large`, `big`, `oversized`, `prominent`, or say it `fills the frame`; make it stand out with light, color contrast, and space. Add `Do not enlarge the <product> to make it stand out` to the exclusions of every wide shot.
 - Keep the scene block under about 180 words. Role names, buyer questions, commercial intent, and validation targets stay in the plan.
 - Multi-piece products: state the visible components and that nothing is added or missing, inside the lock block.
 - Do not label the blocks in the prompt you send; the labels above are for you.
@@ -371,6 +374,8 @@ Compare every output with every `reference_invariants` item and mark it `pass`, 
 
 Then run the aesthetic check from art-direction.md §7 on the same image (`thumbnail`, `eye_path`, `light`, `color`, `real`, plus `click` for the hero) and record one line of visible evidence per item. A faithful image that fails the aesthetic check is regenerated like any other failure, with the retry prompt changing only the failed point.
 
+Then check scale (scale-realism.md §5). For every shot with a size-stable anchor, measure the product's long side and one known edge of the anchor in pixels and run `python scripts/scale_check.py --product-cm <cm> --product-px <px> --anchor "<name>:<low>-<high>:<px>"`. Record `scale_status`: within 15% `pass`, 15 to 30% `borderline`, beyond 30% `reject`; shots with no stable anchor are `no_anchor` and still get the cover-the-product glance test. The first environment shot of a set is the scale probe: fix the scale sentence in all remaining prompts before generating them if it fails. After two oversized results at the same distance, move one step closer and switch to an anchor of the product's own size class.
+
 Only include a `borderline` image after the user explicitly approves the visible risk.
 
 Reject and regenerate for:
@@ -388,6 +393,7 @@ Reject and regenerate for:
 - a frame where the eye lands on a prop, the background, or a person before the product
 - a shot that fails its assigned buyer question
 - a shot that breaks campaign cohesion or repeats another shot's prop cluster without new buyer value
+- a product drawn more than 30% larger or smaller than its real size against a size-stable anchor (mantel, door, chair, table, hand), a hanging product that ignores gravity, or a product covering the working part of what it hangs on or sits against
 - human presence that obscures details, creates awkward scale, or conflicts with the planned action
 - any first-glance miniature/toy impression, foreground-limb dominance, or user-rejected human/product scale; user rejection overrides an earlier internal pass
 

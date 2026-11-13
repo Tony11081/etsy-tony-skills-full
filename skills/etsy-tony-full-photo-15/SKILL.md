@@ -73,6 +73,7 @@ description: "为用户已有产品制作或审查 15 张 Etsy 商品图，保�
 | `source_classification`, `publish_readiness` | 上节四分类 + `VERIFIED_SUCCESS/PARTIAL/BLOCKED/UNVERIFIED` |
 | `category_adapter` | 6 项：`product_form`、`buyer_questions`（3–6 个具体问题）、`scene_capacity`（experience_led / balanced / proof_led）、`human_presence_budget`（含 `human_scale_risk`）、`role_substitutions`（缺证据的模板角色 → 替代角色）、`restricted_views`（参考图未覆盖、不得虚构的面/状态） |
 | `art_direction` | 读懂产品、读懂买家、`selling_points`（三到五条卖点，各配证据和构图）、视觉世界、光、色板、台面、道具卡司、镜头、`mood_profile`、`why_this_product`（字段见 photo-engine 的 art-direction.md 第 3 节和 composition-library.md） |
+| `scale_lock` | 真实尺寸及来源、尺寸级别、与手或小臂的关系、每个场景最多两个尺寸稳定的参照物及相对关系、产品落点（字段见 photo-engine 的 scale-realism.md 第 1 节）；没有可靠尺寸写 `unverified`，只拍没有尺度参照的画面 |
 | `motif_proof` | 仅印花、刺绣、插画图案类产品：图案的精确证据由什么提供（实拍或参考裁切 / 平面原图的确定性图 / 用户批准远景里的 `motif_redraw`） |
 | `image_backend` | `builtin` 或 `openrouter`（见「生成能力与依赖」） |
 | `dimension_data_locked` | 锁定的数字、单位、标签；无尺寸时写 `none` 并选 `scale_effect` 或 `dimension-ready_inventory` |
@@ -103,6 +104,7 @@ description: "为用户已有产品制作或审查 15 张 Etsy 商品图，保�
 | 规划 15 个角色、分配视角（每次生产） | [shot-roles-and-views.md](references/shot-roles-and-views.md)、[category-adaptation.md](references/category-adaptation.md) |
 | `scene_capacity` 为 experience_led 或 balanced，且有生成的生活/使用/送礼场景 | [scene-planning.md](references/scene-planning.md) 全文 |
 | 写任何生成 prompt 之前、每批生成之后（所有产品，含 proof_led 与纯棚拍） | [scene-planning.md 第 3 节](references/scene-planning.md)（色彩准确、氛围与白平衡门）+ `scripts/color_cast_check.py` |
+| 任何一张图里有家具、门、壁炉、台面、手等参照物（几乎每次生产） | `../etsy-tony-full-photo-engine/references/scale-realism.md` + `../etsy-tony-full-photo-engine/scripts/scale_check.py` |
 | 产品是家具或家具尺度物件 | [furniture-scale.md](references/furniture-scale.md) |
 | 生成或逐张审查前（主图、尺寸、变体、个性化、技术参数） | [image-rules.md](references/image-rules.md)；视频与 alt text 段只在被要求时读 |
 | 制作或重新规划（执行顺序、探针、批次、生图工具） | [production-workflow.md](references/production-workflow.md) |

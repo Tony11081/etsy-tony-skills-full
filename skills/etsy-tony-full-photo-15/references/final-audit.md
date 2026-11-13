@@ -23,6 +23,7 @@
 - 有个性化或 Variation 标签：`label_accuracy`。
 - 场景型镜头：`scene_mode_actual`（studio_evidence / contextual_evidence / functional_use / ownership_story / deterministic_graphic，按渲染结果归类）+ 场景承载测试是否通过。
 - 生活/拥有/使用场景：scene-planning.md 第 4 节的五项创意分及各自可见证据；总分单独写不算完成。
+- 画面里有尺寸稳定的参照物（门、壁炉、桌椅、台面、手）：`scale_status`（pass / borderline / reject，附 `scale_check.py` 的输出：产品被画成多少厘米、真实多少、偏差多少；规则见 photo-engine 的 scale-realism.md 第 5 节）。没有稳定参照物写 `no_anchor`。`reject` 的图 verdict 不得为 pass。
 - 出现可见人体：`human_scale_status`（pass / borderline / reject：第一眼是否像迷你/玩具、肢体是否主导前景、透视是否一致）。
 - 家具场景：`lived_in_evidence`（见 furniture-scale.md 第 5 节）。
 - 带文字的图：手机宽度下可读性。
@@ -39,6 +40,7 @@
 - 没有从无关 campaign 继承的色板、道具簇、动作或故事。
 - 实际场景承载数 ≥ 该档下限（proof_led 无情境例外需明确处理）；纯底/棚拍/确定性图数在预算内；坍缩成彩色底的场景已重新分类而非被原谅。`experience_led` 集前五张至少两张场景承载，且任何位置不连续超过两张纯底/信息板。
 - 家具：达到 `lived_in_floor`，前五张至少一张 lived-in，无被装饰道具伪装的空展厅簇；紧凑家具在 `human_presence_budget` 内，用户否决的人物路线已移除。
+- 尺度一致：所有带环境的图里，产品相对参照物的大小都与 `scale_lock` 相符，且彼此一致；不能这张袜子到壁炉一半、那张只到四分之一。远景里产品占画面的比例符合「产品尺寸 ÷ 取景范围」。
 - 构图多样：每张都有 `composition` 代号；15 张至少 7 种构图，同一种最多 3 张，相邻两张不同种；远、中、近、特写四档景别都有；`selling_points` 排前三的每条至少有两张不同构图的图在证明；没有两张图只差背景。
 - 整套看得出来自 `art_direction` 的同一个视觉世界：光的方向与质地、色板、台面材质、道具卡司一致；没有哪张像从别的产品的 campaign 里拿来的。每张的 `aesthetic_check` 无 fail。
 - 清单、比较、细节、尺寸底图共享中性色彩准确的基线（`true_color`）；`true_color` 整套的主图也在其中。样片墙中无未记录的黄/橙偏色；`warm_scene` 镜头之间暖的程度一致，产品颜色在每张图里都和参考图一样。以最终文件重跑 `scripts/color_cast_check.py`（替换过任何一张都要重跑，`warm_scene` 镜头用 `--warm-shots` 列出）：`true_color` 镜头的 `median_neutral_b` ≤ 3；无 `reject`；`borderline` 仅限用户明确批准的图；`palette_warm_dominant` 的图不超过登记的暖光例外数（≤ 2），且不含证据镜头；`no_neutral_anchor` 为 0；标为 `warm_scene` 的镜头里没有颜色/材质比较、清单、细节、尺寸底图。任一不满足 → `set_coverage_diversity_status` 不得为 `VERIFIED_SUCCESS`。
