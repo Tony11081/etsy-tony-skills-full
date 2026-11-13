@@ -72,7 +72,7 @@ description: "为用户已有产品制作或审查 15 张 Etsy 商品图，保�
 | `product_truth` | 已确认事实 + `unknowns` 列表 |
 | `source_classification`, `publish_readiness` | 上节四分类 + `VERIFIED_SUCCESS/PARTIAL/BLOCKED/UNVERIFIED` |
 | `category_adapter` | 6 项：`product_form`、`buyer_questions`（3–6 个具体问题）、`scene_capacity`（experience_led / balanced / proof_led）、`human_presence_budget`（含 `human_scale_risk`）、`role_substitutions`（缺证据的模板角色 → 替代角色）、`restricted_views`（参考图未覆盖、不得虚构的面/状态） |
-| `art_direction` | 读懂产品、读懂买家、`selling_points`（三到五条卖点，各配证据和构图）、视觉世界、光、色板、台面、道具卡司、镜头、`mood_profile`、`why_this_product`（字段见 photo-engine 的 art-direction.md 第 3 节和 composition-library.md） |
+| `art_direction` | 读懂产品、读懂买家、`selling_points`（三到五条卖点，各配证据和构图）、`atmosphere`（场合型 / 生活型 / 证据型、买家要的那一幕、感受、场合信号、发光物、人的痕迹、产品状态）、视觉世界、光、色板、台面、道具卡司、镜头、`mood_profile`、`why_this_product`（字段见 photo-engine 的 art-direction.md 第 3 节和 composition-library.md） |
 | `scale_lock` | 真实尺寸及来源、尺寸级别、与手或小臂的关系、每个场景最多两个尺寸稳定的参照物及相对关系、产品落点（字段见 photo-engine 的 scale-realism.md 第 1 节）；没有可靠尺寸写 `unverified`，只拍没有尺度参照的画面 |
 | `motif_proof` | 仅印花、刺绣、插画图案类产品：图案的精确证据由什么提供（实拍或参考裁切 / 平面原图的确定性图 / 用户批准远景里的 `motif_redraw`） |
 | `image_backend` | `builtin` 或 `openrouter`（见「生成能力与依赖」） |
@@ -83,11 +83,12 @@ description: "为用户已有产品制作或审查 15 张 Etsy 商品图，保�
 
 **按条件必填**：`variation_mapping`（有 Variation 时，选项名 → 证据 → 图）；`furniture_scale`（家具尺度产品，见 [furniture-scale.md](references/furniture-scale.md)）；`color_temperature_exceptions`（`true_color` 镜头里出现暖光源时）；`human_probe_result`（`human_presence_budget` > 0 且已生成首张含人图后：pass / reject）。
 
-**每张图 5 个必填**（`shots[15]`）
+**每张图 6 个必填**（`shots[15]`）
 
 | 字段 | 要求 |
 | --- | --- |
 | `buyer_question` | 这张图回答哪个具体买家问题 |
+| `scene_level` | `L0` 纯底 / `L1` 点缀 / `L2` 一角 / `L3` 那一幕（photo-engine 的 atmosphere.md 第 3 节）；整套张数要过该产品类型的下限 |
 | `composition` | 构图代号（composition-library.md 第二节的 A–M）和它证明的卖点 |
 | `view` | 一句话：产品哪个面朝相机、如何转/倾、相机方位与高度、距离与裁切 |
 | `visible_view_cues` | 该视角成立时画面里**可观察到**的证据：透视缩短、哪个已有来源的面变宽/露出、边缘遮挡、支撑/佩戴关系。不写"三分之一侧面"这类不可核对的话 |
@@ -100,7 +101,7 @@ description: "为用户已有产品制作或审查 15 张 Etsy 商品图，保�
 
 | 时机 | 读取 |
 | --- | --- |
-| 定场景、写任何 prompt 之前（每次生产，所有产品） | `../etsy-tony-full-photo-engine/references/art-direction.md` 全文；同目录 `composition-library.md` 读第一、二节和对得上的产品家族；`scene-library.md` 只读对得上的产品家族、场合、风格条目 |
+| 定场景、写任何 prompt 之前（每次生产，所有产品） | `../etsy-tony-full-photo-engine/references/art-direction.md` 和 `atmosphere.md` 全文；同目录 `composition-library.md` 读第一、二节和对得上的产品家族；`scene-library.md` 只读对得上的产品家族、场合、风格条目 |
 | 规划 15 个角色、分配视角（每次生产） | [shot-roles-and-views.md](references/shot-roles-and-views.md)、[category-adaptation.md](references/category-adaptation.md) |
 | `scene_capacity` 为 experience_led 或 balanced，且有生成的生活/使用/送礼场景 | [scene-planning.md](references/scene-planning.md) 全文 |
 | 写任何生成 prompt 之前、每批生成之后（所有产品，含 proof_led 与纯棚拍） | [scene-planning.md 第 3 节](references/scene-planning.md)（色彩准确、氛围与白平衡门）+ `scripts/color_cast_check.py` |

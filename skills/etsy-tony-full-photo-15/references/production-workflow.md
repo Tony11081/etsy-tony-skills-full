@@ -5,13 +5,14 @@
 ## 1. 工作流
 
 1. 查看全部所需参考，完成 SKILL.md 的产品事实门与来源分类。
-1a. 读 `../etsy-tony-full-photo-engine/references/art-direction.md`，再读同目录 `scene-library.md` 里对得上的产品家族、场合、风格条目，写 `art_direction`：读懂产品 → 读懂买家 → 按同目录 `composition-library.md` 列卖点、给每张图配构图 → 定视觉世界（光、色板、台面、道具卡司、镜头、`mood_profile`）。`buyer_reading.worry` 进入下一步的 `buyer_questions`。这一步不分配每张图的场景，只定整套的世界。 同时按同目录 `scale-realism.md` 写 `scale_lock`（真实尺寸、参照物、落点）；每张带环境的图的 prompt 都要有尺度句。
+1a. 读 `../etsy-tony-full-photo-engine/references/art-direction.md`，再读同目录 `scene-library.md` 里对得上的产品家族、场合、风格条目，写 `art_direction`：读懂产品 → 读懂买家 → 按同目录 `composition-library.md` 列卖点、给每张图配构图 → 定视觉世界（光、色板、台面、道具卡司、镜头、`mood_profile`）。`buyer_reading.worry` 进入下一步的 `buyer_questions`。这一步不分配每张图的场景，只定整套的世界。 同时按同目录 `scale-realism.md` 写 `scale_lock`（真实尺寸、参照物、落点）；每张带环境的图的 prompt 都要有尺度句。 再按同目录 `atmosphere.md` 判产品类型、写 `atmosphere`、给每张图标 `scene_level` 并核对下限。
 2. 读 [category-adaptation.md](category-adaptation.md) 与 [shot-roles-and-views.md](shot-roles-and-views.md)：写 `category_adapter`（6 项），把 15 个角色映射到买家问题与来源证据，完成每张图的 `view` / `visible_view_cues` / `evidence_source` / `information_gain`，通过视角预检。**在选装饰环境或写 prompt 之前保存这些。**
 3. 若 `scene_capacity` 为 experience_led / balanced 且有生活场景，读 [scene-planning.md](scene-planning.md)：在 `art_direction` 的视觉世界之内，围绕已分配的视角设计各镜头的时刻与 `scene_anchor`，填 `scene_counts`，检查前五张混合与序列门。家具产品读 [furniture-scale.md](furniture-scale.md) 并填 `furniture_scale` 与每张的 `lived_in`。
 4. 填 `publish_readiness`、`dimension_data_locked`、`non_included_items`，有 Variation 时填 `variation_mapping`。
 5. 每张图写一份**自包含**的 prompt 文件（按第 4 节的三段写法），带上它的姿态、朝向、相机、框取、可见线索、该镜头 `mood_profile` 的色彩要求、`anti_template`。不把完整计划 schema 复制进每个 prompt，不通过 shell 传大 JSON。
 6. 按第 2 节生成并检视风险探针，再按有界批次生成其余图。
 7. 所有精确测量与选项图用确定性叠加。
+7c. 每批生成后按实际画面重判每张的 `scene_level`，`L2`、`L3` 的图记 `atmosphere_check`。比计划低一级的重做；整套数下来不够下限，把最弱的 `L1` 换成 `L2` 或 `L3`。
 7b. 每批生成后，对每张有稳定参照物的图跑 `scale_check.py`，结果记入该图的 `scale_status`（pass / borderline / reject / no_anchor）。`reject` 重生成，重试只改尺度句和景别；同一景别连续两次偏大，换近一档并改用与产品同量级的参照物。
 7a. 每批生成后立即跑 `python scripts/color_cast_check.py <out-dir> --json <out-dir>/color-cast-report.json`（脚本随本 Skill 附带；`warm_scene` 镜头用 `--warm-shots 1,7,9` 列出编号）。`reject` 一律重生成；`borderline` 按 [scene-planning.md](scene-planning.md) 第 3 节决定修正或重生成；`palette_warm_dominant` / `no_neutral_anchor` 是场景规划问题，改该 shot 的 `Palette` 与 `Scene` 再生成，不靠白平衡修正掩盖。
 8. 每张渲染结果先描述再对照（参考图 → 锁定事实 → 最近的相似图 → shot 计划），再过审美门（art-direction.md 第 7 节：`thumbnail`、`eye_path`、`light`、`color`、`real`，主图加 `click`）。保真和审美都 `pass` 才进候选集。
@@ -22,7 +23,8 @@
 
 用户已提供可读参考、且未要求逐阶段审批时默认启用。它只改变执行顺序与资产构建方式；所有产品事实、来源、尺寸、场景、人物比例、保真、发布就绪门照常适用。
 
-- **shot-01 是保守的保真探针**：对 exact-detail 产品，用保留产品的编辑或主要只换环境的克制场景；不把第一枪花在容易被重设计的激进构图上。
+- **保真探针用一张证据图做，不用主图**：对 exact-detail 产品，先生成计划里一张正面完整的证据图（`L0` 或 `L1`），确认产品能被画准。实测克制的场景并不比完整的场景更保真，所以不为保真把主图拍空。
+- **shot-01（主图）是氛围探针**：`occasion_led` 产品按 `L3`、`lifestyle_led` 产品按 `L2` 以上生成，过 atmosphere.md 第 5 节的 `cover_test`、`hero_test`、`desire`。没过就先改 `atmosphere` 和场景写法，再生成其余场景图。两张探针可以同时跑。
 - shot-01 同时是**色彩探针**：先跑 `scripts/color_cast_check.py`，按该镜头的 `mood_profile` 判定。`true_color`：`neutral_b` ≤ 3 且无 `palette_warm_dominant`；没过说明本次产品/类目在把模型往暖色拉（金色、木质、婚礼、节日类尤其常见），先收紧全部剩余 prompt 的 `Color` 一句和场景材质（换掉暖色台面、加大中性锚点、去掉蜡烛/灯串/夕阳）。`warm_scene`：`neutral_b` ≤ 8、无 `no_neutral_anchor`，并且产品颜色与参考图并排一致；没过就把暖光源挪到背景、加强产品一侧的中性补光。不要带着有问题的基线批量生成 14 张后再逐张修。
 - shot-01 还是**审美探针**：过不了审美门，先改 `art_direction`（光、色板、台面、道具），再生成其余的图；平庸的基线批量生成出来还是平庸。
 - 第一张带环境的图是**尺度探针**：量产品长边和一个稳定参照物的已知边，跑 photo-engine 的 `scripts/scale_check.py`（规则见 scale-realism.md 第 5 节）。偏差超过 30% 就重做，并先改完所有剩余场景 prompt 的尺度句再继续；模型一旦在这套图里把产品画大，后面的远景都会跟着大。
@@ -70,7 +72,7 @@
 Product photo for an Etsy listing. The attached reference images are the only source of truth for the product: <name and reference-verified identity>. Keep its structure, proportions, outline, colors, material, hardware, engraving, motifs and included items exactly as in the references<; fragile details named one by one, any text quoted verbatim>. Ignore the references' background and lighting.
 
 <画面，四到七句，像摄影师描述一张已经拍好的照片>
-<scene_anchor: where and when; what the product rests on or hangs from and how it touches it; fore/mid/background>. <scale, when a size-stable anchor is in frame: real size in inches and cm; one or two relations to the anchor; where the product ends and what it leaves uncovered; its share of the frame at this camera distance>. <view: which face is toward the camera, turn/tilt, camera height, distance, lens feel>. <light from art_direction: source, side, softness, what the shadows do>. <the two or three surrounding materials and colors; the product is the strongest color or value in the frame>. <one trace of real life; human plan if any: crop, action, contact point, details kept unobstructed>.
+<scene_anchor: where and when; what the product rests on or hangs from and how it touches it; fore/mid/background>. <scale, when a size-stable anchor is in frame: real size in inches and cm; one or two relations to the anchor; where the product ends and what it leaves uncovered; its share of the frame at this camera distance>. <view: which face is toward the camera, turn/tilt, camera height, distance, lens feel>. <light from art_direction: source, side, softness, what the shadows do>. <the two or three surrounding materials and colors; the product is the strongest color or value in the frame>. <L2/L3 shots: three to five occasion signals and where each sits (foreground, beside the product, background); the glowing source behind the product; the product's in-use state>. <one trace of real life; human plan if any: crop, action, contact point, details kept unobstructed>.
 
 <收尾，一到三句>
 Color: <true_color → neutral daylight; name the largest white or gray object, it renders paper-white or neutral gray; name one large neutral or cool anchor | warm_scene → name the warm sources and where they sit; the light on the product is neutral daylight; name one white object that reads as soft white; the product matches the reference colors>. Must be visible: <visible_view_cues>. Square frame with breathing room for 4:5 and landscape crops. <anti_template: the one repeated treatment this shot must avoid>. No added text, watermarks, logos, faces, badges, arrows or labels.

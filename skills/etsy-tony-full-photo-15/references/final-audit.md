@@ -23,6 +23,7 @@
 - 有个性化或 Variation 标签：`label_accuracy`。
 - 场景型镜头：`scene_mode_actual`（studio_evidence / contextual_evidence / functional_use / ownership_story / deterministic_graphic，按渲染结果归类）+ 场景承载测试是否通过。
 - 生活/拥有/使用场景：scene-planning.md 第 4 节的五项创意分及各自可见证据；总分单独写不算完成。
+- 每张图：`scene_level_actual`（按渲染结果重判的 `L0`–`L3`，不抄计划）。`L2`、`L3` 的图另写 `atmosphere_check`：`cover_test` / `hero_test` / `desire` 各 pass 或 fail 加一句可见证据（photo-engine 的 atmosphere.md 第 5 节）；任一项 fail，该图 verdict 不得为 pass。
 - 画面里有尺寸稳定的参照物（门、壁炉、桌椅、台面、手）：`scale_status`（pass / borderline / reject，附 `scale_check.py` 的输出：产品被画成多少厘米、真实多少、偏差多少；规则见 photo-engine 的 scale-realism.md 第 5 节）。没有稳定参照物写 `no_anchor`。`reject` 的图 verdict 不得为 pass。
 - 出现可见人体：`human_scale_status`（pass / borderline / reject：第一眼是否像迷你/玩具、肢体是否主导前景、透视是否一致）。
 - 家具场景：`lived_in_evidence`（见 furniture-scale.md 第 5 节）。
@@ -40,6 +41,7 @@
 - 没有从无关 campaign 继承的色板、道具簇、动作或故事。
 - 实际场景承载数 ≥ 该档下限（proof_led 无情境例外需明确处理）；纯底/棚拍/确定性图数在预算内；坍缩成彩色底的场景已重新分类而非被原谅。`experience_led` 集前五张至少两张场景承载，且任何位置不连续超过两张纯底/信息板。
 - 家具：达到 `lived_in_floor`，前五张至少一张 lived-in，无被装饰道具伪装的空展厅簇；紧凑家具在 `human_presence_budget` 内，用户否决的人物路线已移除。
+- 氛围下限：按 `scene_level_actual` 数。`occasion_led`：主图 `L3`，`L3` 至少 5 张，`L2` 加 `L3` 至少 9 张，前三张至少两张 `L3`；`lifestyle_led`：主图 `L2` 以上，`L3` 至少 3 张，合计至少 7 张。不够就不是可交付的一套，哪怕每张单看都 pass。场合是暖的，主图和场景图是 `warm_scene`。
 - 尺度一致：所有带环境的图里，产品相对参照物的大小都与 `scale_lock` 相符，且彼此一致；不能这张袜子到壁炉一半、那张只到四分之一。远景里产品占画面的比例符合「产品尺寸 ÷ 取景范围」。
 - 构图多样：每张都有 `composition` 代号；15 张至少 7 种构图，同一种最多 3 张，相邻两张不同种；远、中、近、特写四档景别都有；`selling_points` 排前三的每条至少有两张不同构图的图在证明；没有两张图只差背景。
 - 整套看得出来自 `art_direction` 的同一个视觉世界：光的方向与质地、色板、台面材质、道具卡司一致；没有哪张像从别的产品的 campaign 里拿来的。每张的 `aesthetic_check` 无 fail。

@@ -87,6 +87,7 @@
   "prop_cast": ["整套最多五六件道具，每件写它证明什么"],
   "camera": "镜头感（焦段）、常用机位高度、景深",
   "mood_profile": "true_color | warm_scene",
+  "atmosphere": { "...": "类型、那一幕、感受、场合信号、发光物、人的痕迹、产品状态，见 atmosphere.md 第 2 节" },
   "scale_lock": { "...": "真实尺寸、尺寸级别、人体关系、参照物、落点，见 scale-realism.md 第 1 节" },
   "why_this_product": "换成别的产品，这个世界就不成立的理由"
 }
@@ -96,12 +97,13 @@
 - **卖点决定构图。** 按 [composition-library.md](composition-library.md) 列三到五条 `selling_points`，每条配至少两种构图；每张图标一个 `composition` 代号和它证明的卖点。一套图里一半以上是「产品居中摆着」，就是没做这一步。
 - **色板六三一。** 大面积背景色、次要表面色、一点强调色，总共不超过三个色相加中性色。产品必须是画面里最浓的颜色，或者明度反差最大的东西。
 - **明度先分开。** 深色产品配中浅背景，浅色产品配中深背景。浅配浅、深配深，缩略图里就糊成一片。
+- **氛围有下限。** 按 [atmosphere.md](atmosphere.md) 判产品是场合型、生活型还是证据型，写 `atmosphere`，给每张图标 `scene_level`（`L0` 到 `L3`）。场合型产品主图必须是 `L3`：遮住产品，还看得出是什么场合、什么时刻。一面墙加一枝松枝是 `L1`，只算证据图。保真、色准、道具从简都不是把场景拍空的理由。
 - **尺寸先锁死。** 按 [scale-realism.md](scale-realism.md) 写 `scale_lock`。想让产品在画面里大，就把镜头推近、裁掉环境；不放大产品。参照物只用尺寸稳定的（手、门、椅背、台面），不用圣诞树、花瓶、礼盒这类什么尺寸都有的东西。
 - **道具卡司固定。** 整套就这五六件轮流出场，每张最多三件。每件都要答得出「它在这里证明什么」。
 - **`why_this_product` 过不了就重来。** 把产品换成一件不相干的东西，世界照样成立，说明方向太泛。
 - **单张图**不写完整对象，三五行写清：产品的招牌特征、买家那一幕、光、色板、台面。
 
-出现下面任一种，方向作废重写：没有列卖点，或有卖点没有任何一张图在证明；照搬了上一个产品的方案；选的是品类套路但 `product_reading` 里找不到依据；说不出光从哪来；产品不是画面里最抢眼的东西。
+出现下面任一种，方向作废重写：`scene_level` 的张数不够 atmosphere.md 的下限，或「那一幕」只是产品摆在或挂在某处；没有列卖点，或有卖点没有任何一张图在证明；照搬了上一个产品的方案；选的是品类套路但 `product_reading` 里找不到依据；说不出光从哪来；产品不是画面里最抢眼的东西。
 
 ## 4. 硬标准
 
@@ -135,7 +137,7 @@
 
 - 用真材料：亚麻有自然的褶，木有纹，石有哑光。
 - 「住过，但收拾过」：留一处生活的痕迹（半杯咖啡、搭在椅背上的毯子、翻开的书），不是堆杂物。摆完之后拿走一件。
-- 季节线索两三样就够，不要十样。
+- 产品旁边的道具两三样就够。场合信号另算：主图和场景图按 atmosphere.md 的级别配三到五样，多数放在背景和前景并虚化，产品周围保持干净。
 - 道具的大小和产品相称，不让买家误会尺寸，也不让人以为道具包含在内。
 
 **镜头**
@@ -163,7 +165,7 @@
 生图模型吃的是**一段画面描述**，不是一张字段表。字段越多，画面越僵。每张图的 prompt 就三段，用自然的英文写：
 
 1. **锁定**（两三句）：这是 Etsy 商品照；参考图是产品唯一的事实来源；逐项点名不能变的东西和易错细节；写明图案和文字的做法（例：`the crest and the name are a flat print on the velvet, not embroidery, no raised relief`）；不要照搬参考图的背景和光。
-2. **画面**（四到七句）：像摄影师描述一张已经拍好的照片。在哪里、什么时刻；产品挂在或放在什么上面、怎么接触；画面里有尺寸稳定的参照物时加尺度句（scale-realism.md 第 4 节：真实尺寸、和参照物的相对关系、垂到或放到哪里、占画面多少）；哪个面朝镜头、机位多高多远、什么镜头感；光从哪来、多软、影子怎样；周围是哪两三种材质和颜色；一处生活的痕迹。
+2. **画面**（四到七句）：像摄影师描述一张已经拍好的照片。在哪里、什么时刻；产品挂在或放在什么上面、怎么接触；画面里有尺寸稳定的参照物时加尺度句（scale-realism.md 第 4 节：真实尺寸、和参照物的相对关系、垂到或放到哪里、占画面多少）；哪个面朝镜头、机位多高多远、什么镜头感；光从哪来、多软、影子怎样；周围是哪两三种材质和颜色；`L2`、`L3` 的图写出三到五样场合信号各在前景、产品旁还是背景，背景里发光的东西，产品处在什么使用状态（atmosphere.md 第 3、4 节）；一处生活的痕迹。
 3. **收尾**（一两句）：颜色怎么保证（见 scene-planning 第 3 节）；画幅和留白；不要什么（只写这张图真正有风险的两三样）。
 
 写法：
@@ -178,7 +180,7 @@
 ```text
 Product photo for an Etsy listing. The attached reference photos are the only source of truth for the product: a burgundy velvet Christmas stocking with a white faux-fur cuff and the name "Emma" embroidered in gold script on the cuff. Keep its shape, proportions, colors, fabric, cuff, hanging loop and the embroidered name exactly as in the references. Ignore the references' background and lighting.
 
-The stocking hangs from a small brass hook on a white-painted wooden mantel, slightly left of center, the cuff at eye level and the name facing the camera. It is an ordinary family-size stocking, 18 inches (46 cm) long, about a third as tall as the mantel is high: its toe ends level with the top of the firebox opening, and the camera is close enough that only the mantel edge and the upper part of the brick surround are in frame. A garland of fresh cedar with a few pinecones runs along the mantel top; below it, the brick surround falls softly out of focus. Late-afternoon window light comes from the left at a low angle and rakes across the velvet, so the pile shows soft highlights and deep folds; a white wall on the right bounces a gentle fill. Far behind, the lights of a Christmas tree dissolve into small glowing circles. The colors stay quiet: white mantel, deep green cedar, a touch of brass, so the burgundy stocking is the richest color in the frame. Shot straight-on at cuff height with an 85mm look; the whole stocking is sharp, the background soft.
+The stocking hangs from a small brass hook on a white-painted wooden mantel, slightly left of center, the cuff at eye level and the name facing the camera. It is an ordinary family-size stocking, 18 inches (46 cm) long, about a third as tall as the mantel is high: its toe ends level with the top of the firebox opening, and the camera is close enough that only the mantel edge and the upper part of the brick surround are in frame. A candy cane and a small kraft-paper parcel peek out above the cuff, and the corner of a wrapped gift sits blurred in the near foreground. A garland of fresh cedar with a few pinecones runs along the mantel top; below it, the brick surround falls softly out of focus. Late-afternoon window light comes from the left at a low angle and rakes across the velvet, so the pile shows soft highlights and deep folds; a white wall on the right bounces a gentle fill. Far behind, the lights of a Christmas tree dissolve into small glowing circles. The colors stay quiet: white mantel, deep green cedar, a touch of brass, so the burgundy stocking is the richest color in the frame. Shot straight-on at cuff height with an 85mm look; the whole stocking is sharp, the background soft.
 
 The glow comes only from the tree lights in the background; the light on the stocking is neutral daylight, the fur cuff reads as clean soft white and the velvet matches the reference color. Square frame with breathing room on all sides. No added text, no logos, no people, no extra stockings. Do not enlarge the stocking to make it stand out.
 ```
@@ -204,6 +206,7 @@ Shot role: hero / Commercial intent: conversion / Buyer question answered: what 
 | `light` | 说得出光从哪边来吗？材质的质感出来了吗？影子有形状、有接触吗？ |
 | `color` | 色板在 `art_direction` 之内吗？产品是最抢眼的颜色或明度吗？白是干净的吗？ |
 | `real` | 像真人在真地方拍的吗？对照第 5 节逐条排查。 |
+| `atmosphere` | 仅 `L2`、`L3` 的图：atmosphere.md 第 5 节的 `cover_test`、`hero_test`、`desire` 三问都过，实际画面达到计划的 `scene_level`。 |
 | `scale` | 产品和旁边东西的大小关系对吗？有稳定参照物就按 scale-realism.md 第 5 节量一次，偏差超过 30% 是 fail；没有参照物就遮住产品看环境，再问这东西拿在手里有多大。 |
 
 主图再加一项 `click`：和同类商品的主图放在一起，它是不是让人想点的那一张。手头有竞品主图就真的并排看，没有就写 `unverified`，不写 pass。
