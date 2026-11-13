@@ -10,6 +10,7 @@
 3. 若 `scene_capacity` 为 experience_led / balanced 且有生活场景，读 [scene-planning.md](scene-planning.md)：在 `art_direction` 的视觉世界之内，围绕已分配的视角设计各镜头的时刻与 `scene_anchor`，填 `scene_counts`，检查前五张混合与序列门。家具产品读 [furniture-scale.md](furniture-scale.md) 并填 `furniture_scale` 与每张的 `lived_in`。
 4. 填 `publish_readiness`、`dimension_data_locked`、`non_included_items`，有 Variation 时填 `variation_mapping`。
 5. 每张图写一份**自包含**的 prompt 文件（按第 4 节的三段写法），带上它的姿态、朝向、相机、框取、可见线索、该镜头 `mood_profile` 的色彩要求、`anti_template`。不把完整计划 schema 复制进每个 prompt，不通过 shell 传大 JSON。
+5a. 跑 `python scripts/plan_check.py <out-dir>/plan.codex-direct.json --json > <out-dir>/plan-check.json`。fail 就回到 1a 到 5 改计划和 prompt，直到 pass；**pass 之前不发任何生图调用**。
 6. 按第 2 节生成并检视风险探针，再按有界批次生成其余图。
 7. 所有精确测量与选项图用确定性叠加。
 7c. 每批生成后按实际画面重判每张的 `scene_level`，`L2`、`L3` 的图记 `atmosphere_check`。比计划低一级的重做；整套数下来不够下限，把最弱的 `L1` 换成 `L2` 或 `L3`。
@@ -17,6 +18,7 @@
 7a. 每批生成后立即跑 `python scripts/color_cast_check.py <out-dir> --json <out-dir>/color-cast-report.json`（脚本随本 Skill 附带；`warm_scene` 镜头用 `--warm-shots 1,7,9` 列出编号）。`reject` 一律重生成；`borderline` 按 [scene-planning.md](scene-planning.md) 第 3 节决定修正或重生成；`palette_warm_dominant` / `no_neutral_anchor` 是场景规划问题，改该 shot 的 `Palette` 与 `Scene` 再生成，不靠白平衡修正掩盖。
 8. 每张渲染结果先描述再对照（参考图 → 锁定事实 → 最近的相似图 → shot 计划），再过审美门（art-direction.md 第 7 节：`thumbnail`、`eye_path`、`light`、`color`、`real`，主图加 `click`）。保真和审美都 `pass` 才进候选集。
 9. 拼样片墙做整套审查：对照 `view` 与 `visible_view_cues` 看实际产品-相机关系（忽略造型）；重新分类实际背景模式；区分独立构图组与复用底图；审决策覆盖与重复。单张可接受的图在整套里仍可能冗余；只替换无理由的重复，然后重读修订后的样片墙。
+9a. 按渲染结果给每张填 `scene_level_actual`，跑 `python scripts/plan_check.py <out-dir>/plan.codex-direct.json --actual`。fail 说明成片没达到计划的氛围下限：把最弱的 `L1` 重做成 `L2` 或 `L3`，直到 pass。
 10. 运行 [final-audit.md](final-audit.md)。生图工具返回成功或文件存在都不是可用证据。
 
 ## 2. 快速执行模式（默认）

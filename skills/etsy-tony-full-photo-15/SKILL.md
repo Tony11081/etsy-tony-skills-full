@@ -63,7 +63,7 @@ description: "为用户已有产品制作或审查 15 张 Etsy 商品图，保�
 
 ## 精简计划 schema
 
-计划保存为 `plan.codex-direct.json`。字段值要能被审计者证伪；写成 "adds detail"、"three-quarter view" 这类无法核对的话等于未填。
+计划保存为 `plan.codex-direct.json`。**保存后先跑 `python scripts/plan_check.py <out-dir>/plan.codex-direct.json`，结果是 pass 才允许发出第一次生图调用；fail 就按它列出的每一条改计划，不许跳过、不许改脚本。** 它查的是单张图看不出来、整套才会错的东西：氛围类型和那一幕写了没有，`L3`、`L2` 的张数够不够，主图够不够级，暖场合是不是 `warm_scene`，构图种类，尺寸锁，场景 prompt 里有没有尺度句和不该有的词。每张图写 `prompt_file`（相对计划文件的路径）让它能读到 prompt。全部渲染完，按实际画面给每张填 `scene_level_actual`，再跑一次 `plan_check.py --actual`，同样要 pass。字段值要能被审计者证伪；写成 "adds detail"、"three-quarter view" 这类无法核对的话等于未填。
 
 **计划级必填**
 
@@ -131,6 +131,7 @@ proof_led 且无生活场景的产品可跳过 scene-planning 第 1、2、4 节�
   shot-NN.png                # 仅 pass 的图；PARTIAL 时缺号保留空缺，不用他图补位
   rejected/shot-NN-attemptK.png   # 记录有意义的保真失败
   alt-text.json              # 仅 Listing 交接时
+  plan-check.json            # scripts/plan_check.py --json 的输出，生成前一次、渲染后 --actual 一次
   color-cast-report.json     # scripts/color_cast_check.py 输出：每张 profile / neutral_b / frame_rb / status，含修正记录
   generation-log.jsonl       # 仅 openrouter 通道：每次调用的模型与花费
   fidelity-audit.json
