@@ -9,6 +9,15 @@ Usage
   python color_cast_check.py <dir-or-files...>                # measure only
   python color_cast_check.py <dir> --json color-cast-report.json
   python color_cast_check.py <dir> --fix --out <dir>/wb-fixed # measure + correct
+  python color_cast_check.py <dir> --warm-shots 1,7,9,15      # those shots use the warm_scene profile
+
+Profiles (see scene-planning.md §3)
+-----------------------------------
+  true_color  default. Evidence shots (inventory, comparison, detail, dimension
+              base) and every campaign whose mood is neutral daylight.
+  warm_scene  lifestyle / hero shots of a campaign whose art direction is a
+              warm world (holiday, candlelit table, autumn, wood-led). Warmth
+              from the scene is allowed; a yellow cast over the whites is not.
 
 Metrics per image
 -----------------
@@ -16,9 +25,12 @@ Metrics per image
               These are the pixels that should read white / gray.
               b* > 0 = yellow, b* < 0 = blue.
   neutral_a   mean a* of the same pixels. a* > 0 = red/magenta (peach cast).
-  frame_rb    mean(R)/mean(B) over the whole frame. Palette warmth, not white
-              balance: a neutral-WB photo full of wood, linen and gold still
-              scores high here, and buyers still perceive it as "warm".
+  frame_rb    mean(R)/mean(B) over the surroundings: the frame minus strongly
+              colored pixels outside the orange-yellow band, so a red, green
+              or blue product filling the frame is not counted as a warm
+              palette. Palette warmth, not white balance: a neutral-WB photo
+              full of wood, linen and gold still scores high here, and buyers
+              still perceive it as "warm". frame_rb_whole is the raw frame.
   neutral_pct share of pixels used as the neutral sample. Below ~8% the
               neutral_b reading is unreliable (nothing neutral in frame),
               which is itself a palette finding.
@@ -31,10 +43,20 @@ Thresholds (visual daylight target ~5000-5500 K, see scene-planning.md §3)
   frame_rb  >  1.25           palette_warm_dominant (scene planning problem, not WB)
   neutral_pct < 8             no_neutral_anchor     (scene has nothing neutral in it)
 
+Thresholds, warm_scene profile
+------------------------------
+  neutral_b <= 8.0            pass        (whites read as soft warm white)
+  8.0 < neutral_b <= 11.0     borderline  (regenerate with a stronger neutral fill)
+  neutral_b > 11.0            reject      (whites have gone ivory / yellow)
+  neutral_pct < 4             no_neutral_anchor (every white is tinted: a cast, not a mood)
+  frame_rb                    reported only; a warm palette is expected here
+
 --fix applies a per-channel gain so the neutral sample's mean becomes gray.
 It refuses to correct when the required gain exceeds +/-20% (the image is too
 far off; regenerate instead) or when there is no reliable neutral sample.
 A corrected file still needs a product-color re-check against the reference.
+warm_scene shots are never auto-corrected: neutralizing them removes the
+intended light, so a failing warm shot is regenerated instead.
 """
 from __future__ import annotations
 
@@ -42,6 +64,7 @@ import argparse
 import glob
 import json
 import os
+import re
 import sys
 
 import numpy as np
@@ -51,6 +74,12 @@ PASS_B, BORDER_B = 3.0, 6.0
 WARM_RB = 1.25
 MIN_NEUTRAL_PCT = 8.0
 MAX_GAIN_DEV = 0.20
+
+# warm_rb None = palette warmth is reported but not flagged.
+PROFILES = {
+    "true_color": {"pass_b": PASS_B, "border_b": BORDER_B, "warm_rb": WARM_RB, "min_neutral_pct": MIN_NEUTRAL_PCT},
+    "warm_scene": {"pass_b": 8.0, "border_b": 11.0, "warm_rb": None, "min_neutral_pct": 4.0},
+}
 
 
 # --------------------------------------------------------------------------- color math
@@ -88,7 +117,8 @@ def neutral_mask(L, a, b):
 
 
 # --------------------------------------------------------------------------- measure
-def measure(path: str, max_side: int = 768) -> dict:
+def measure(path: str, max_side: int = 768, profile: str = "true_color") -> dict:
+    th = PROFILES[profile]
     im = Image.open(path).convert("RGB")
     im.thumbnail((max_side, max_side))
     rgb = np.asarray(im).astype(np.float32) / 255.0
@@ -98,27 +128,39 @@ def measure(path: str, max_side: int = 768) -> dict:
     pct = float(m.mean() * 100)
     nb = float(b[m].mean()) if m.any() else float("nan")
     na = float(a[m].mean()) if m.any() else float("nan")
-    rb = float(rgb[..., 0].mean() / max(rgb[..., 2].mean(), 1e-6))
+    rb_all = float(rgb[..., 0].mean() / max(rgb[..., 2].mean(), 1e-6))
+    # Palette warmth is about the surroundings (wood, linen, beige, gold), so strongly
+    # colored pixels outside the orange-yellow band are left out: a red, green or blue
+    # product filling the frame is not a warm palette.
+    chroma = np.sqrt(a * a + b * b)
+    hue = np.degrees(np.arctan2(b, a)) % 360
+    env = ~((chroma >= 30) & ((hue < 35) | (hue > 100)))
+    if env.mean() >= 0.15:
+        rb = float(rgb[..., 0][env].mean() / max(rgb[..., 2][env].mean(), 1e-6))
+    else:  # almost the whole frame is saturated product: fall back to the whole frame
+        rb = rb_all
 
     flags = []
-    if pct < MIN_NEUTRAL_PCT:
+    if pct < th["min_neutral_pct"]:
         flags.append("no_neutral_anchor")
-    if rb > WARM_RB:
+    if th["warm_rb"] is not None and rb > th["warm_rb"]:
         flags.append("palette_warm_dominant")
     if np.isnan(nb):
         status = "unmeasurable"
-    elif nb <= PASS_B:
+    elif nb <= th["pass_b"]:
         status = "pass"
-    elif nb <= BORDER_B:
+    elif nb <= th["border_b"]:
         status = "borderline"
     else:
         status = "reject"
 
     return {
         "file": os.path.basename(path),
+        "profile": profile,
         "neutral_b": None if np.isnan(nb) else round(nb, 1),
         "neutral_a": None if np.isnan(na) else round(na, 1),
         "frame_rb": round(rb, 2),
+        "frame_rb_whole": round(rb_all, 2),
         "neutral_pct": round(pct, 1),
         "color_cast_status": status,
         "flags": flags,
@@ -175,12 +217,31 @@ def collect(inputs):
     return files
 
 
+def is_warm_shot(path: str, tokens: set) -> bool:
+    """A token matches by file name, by stem, or by shot number (7 -> shot-07.*)."""
+    base = os.path.basename(path)
+    stem = os.path.splitext(base)[0]
+    if base in tokens or stem in tokens:
+        return True
+    m = re.match(r"shot-(\d+)", stem)
+    return bool(m) and str(int(m.group(1))) in tokens
+
+
+def _median(values):
+    arr = np.array([v for v in values if v is not None], dtype=float)
+    return round(float(np.median(arr)), 1) if arr.size else None
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("inputs", nargs="+", help="directories (shot-*.png) or image files")
     ap.add_argument("--json", help="write per-shot report to this path")
     ap.add_argument("--fix", action="store_true", help="apply neutral-anchor white-balance correction")
     ap.add_argument("--out", help="output dir for --fix (default: <input dir>/wb-fixed)")
+    ap.add_argument("--profile", choices=sorted(PROFILES), default="true_color",
+                    help="profile for every image not named in --warm-shots (default: true_color)")
+    ap.add_argument("--warm-shots", default="",
+                    help="comma-separated shot numbers or file names judged with the warm_scene profile, e.g. 1,7,9")
     args = ap.parse_args(argv)
 
     files = collect(args.inputs)
@@ -188,17 +249,23 @@ def main(argv=None):
         print("no images found", file=sys.stderr)
         return 2
 
-    rows = [measure(f) for f in files]
-    print(f"{'file':<20}{'b*':>6}{'a*':>6}{'R/B':>6}{'neut%':>7}  status      flags")
+    tokens = {t.strip() for t in args.warm_shots.split(",") if t.strip()}
+    tokens |= {str(int(t)) for t in tokens if t.isdigit()}  # "07" and "7" both match
+    rows = [measure(f, profile="warm_scene" if is_warm_shot(f, tokens) else args.profile) for f in files]
+    print(f"{'file':<20}{'profile':<12}{'b*':>6}{'a*':>6}{'R/B':>6}{'neut%':>7}  status      flags")
     for r in rows:
         nb = "n/a" if r["neutral_b"] is None else f"{r['neutral_b']:.1f}"
         na = "n/a" if r["neutral_a"] is None else f"{r['neutral_a']:.1f}"
-        print(f"{r['file']:<20}{nb:>6}{na:>6}{r['frame_rb']:>6.2f}{r['neutral_pct']:>6.0f}%  {r['color_cast_status']:<10}  {','.join(r['flags'])}")
+        print(f"{r['file']:<20}{r['profile']:<12}{nb:>6}{na:>6}{r['frame_rb']:>6.2f}{r['neutral_pct']:>6.0f}%  {r['color_cast_status']:<10}  {','.join(r['flags'])}")
 
-    bs = np.array([r["neutral_b"] for r in rows if r["neutral_b"] is not None], dtype=float)
+    true_rows = [r for r in rows if r["profile"] == "true_color"]
+    warm_rows = [r for r in rows if r["profile"] == "warm_scene"]
     summary = {
         "shots": len(rows),
-        "median_neutral_b": round(float(np.median(bs)), 1) if bs.size else None,
+        # Baseline of the evidence / neutral shots only; warm_scene shots are reported separately.
+        "median_neutral_b": _median(r["neutral_b"] for r in true_rows),
+        "warm_scene_shots": len(warm_rows),
+        "median_neutral_b_warm_scene": _median(r["neutral_b"] for r in warm_rows),
         "borderline": int(sum(r["color_cast_status"] == "borderline" for r in rows)),
         "reject": int(sum(r["color_cast_status"] == "reject" for r in rows)),
         "palette_warm_dominant": int(sum("palette_warm_dominant" in r["flags"] for r in rows)),
@@ -210,6 +277,12 @@ def main(argv=None):
     if args.fix:
         for f, r in zip(files, rows):
             if r["color_cast_status"] in ("borderline", "reject"):
+                if r["profile"] == "warm_scene":
+                    res = {"file": r["file"], "fixed": False,
+                           "reason": "warm_scene shot: regenerate with a stronger neutral fill instead of neutralizing"}
+                    fixes.append(res)
+                    print(f"skip  {res['file']}: {res['reason']}")
+                    continue
                 out_dir = args.out or os.path.join(os.path.dirname(f) or ".", "wb-fixed")
                 res = fix(f, os.path.join(out_dir, os.path.basename(f)))
                 fixes.append(res)
@@ -222,6 +295,7 @@ def main(argv=None):
         with open(args.json, "w", encoding="utf-8") as fh:
             json.dump({"thresholds": {"pass_b": PASS_B, "borderline_b": BORDER_B, "warm_rb": WARM_RB,
                                       "min_neutral_pct": MIN_NEUTRAL_PCT},
+                       "profiles": PROFILES,
                        "summary": summary, "shots": rows, "fixes": fixes}, fh, ensure_ascii=False, indent=2)
         print(f"report -> {args.json}")
     return 0

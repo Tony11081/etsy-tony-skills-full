@@ -5,6 +5,8 @@ description: "为用户已有产品制作或审查 15 张 Etsy 商品图，保�
 
 # Etsy Product Photo 15
 
+**先读 [CHECKLIST.md](CHECKLIST.md)，按它的顺序做。** 本文件和各 references 是细则，到哪一步再读哪一段，不要一次全部读进来。
+
 ## 何时使用
 
 - 用户明确要求固定 15 张 Etsy 图，或明确点名本 Skill。
@@ -15,12 +17,13 @@ description: "为用户已有产品制作或审查 15 张 Etsy 商品图，保�
 
 平台事实（Etsy 帮助中心，2026-09 复核）：单个 Listing 最多 20 张图、2 个视频（3–15 秒、≤100 MB、上传后静音）；首图至少 635 px，建议 ≥2000 px。15 是用户指定的格式，不是平台上限，也不是排名承诺。
 
-## 四条不可动的原则
+## 五条不可动的原则
 
 1. **产品事实门**：只用参考图和用户确认的事实；`Unknown` 保持 unknown，不编尺寸、材质、工艺、内含物、个性化示例、包装、价格、发货、Production Partner。
 2. **发布就绪分级**：每次 campaign 先分类，`concept_only` 可交付但 `publish_readiness=BLOCKED`；`prohibited_or_unlicensed` 直接停止。
 3. **尺寸图确定性叠加**：数字、单位、线条、箭头一律在生图之后用 SVG / HTML-CSS / Pillow 等确定性方法叠加，逐一核对锁定数据；不信任生图模型写字。
 4. **审实际渲染，不信 prompt 标签**：接受任何一张图前，先描述画面里实际看到的，再对照参考图、最相近的一张图、最后才看它的角色和 prompt。文件存在、工具返回成功、场景名不同，都不是通过依据。色偏同理：不凭肉眼（看一批暖图会色适应），用 `scripts/color_cast_check.py` 的测量值判定，规则见 [scene-planning.md 第 3 节](references/scene-planning.md)。
+5. **先定美术方向，再写场景**：写任何场景和 prompt 之前，先读懂这个产品，再读懂买它的 Etsy 买家，然后定下整套图唯一的视觉世界，存为 `art_direction`。产品不同，世界就不同；换一个不相干的产品也成立的方向不算完成。每张图除了保真，还要过审美门。规则见 `../etsy-tony-full-photo-engine/references/art-direction.md`。
 
 ## 必带 prompt
 
@@ -34,6 +37,8 @@ description: "为用户已有产品制作或审查 15 张 Etsy 商品图，保�
 
 - `人物使用效果展示` 表达的是"展示买家使用意图"，不是每张都要有人。类目适配判定人物不安全时，用锁定尺寸、建筑/家具比例锚、已验证的产品状态变化或隐含使用者痕迹来满足该意图，并在计划里记录替换。
 - `发挥你的设计才能开始设计吧` 授权的是**构图、场景、光线、镜头、道具**的创造性；不授权改变产品的几何、比例、轮廓、颜色、材质、部件数量、五金、雕刻、图案或内含物。产品本身不是设计对象。
+- `符合etsy顾客喜欢` 和 `资深的etsy产品设计师` 要落到实处：按第 5 条原则读懂买家、定视觉世界、过审美门，不停在形容词上。
+- `整体要有生活气息` 说的是真实住家里的一个时刻，由 `art_direction` 里买家想象的那一幕决定；不是给每张图加暖色，也不是堆道具。
 
 ## 产品事实门
 
@@ -60,7 +65,7 @@ description: "为用户已有产品制作或审查 15 张 Etsy 商品图，保�
 
 ## 精简计划 schema
 
-计划保存为 `plan.codex-direct.json`。字段值要能被审计者证伪；写成 "adds detail"、"three-quarter view" 这类无法核对的话等于未填。
+计划保存为 `plan.codex-direct.json`。**保存后先跑 `python scripts/plan_check.py <out-dir>/plan.codex-direct.json`，结果是 pass 才允许发出第一次生图调用；fail 就按它列出的每一条改计划，不许跳过、不许改脚本。** 它查的是单张图看不出来、整套才会错的东西：氛围类型和那一幕写了没有，`L3`、`L2` 的张数够不够，主图够不够级，暖场合是不是 `warm_scene`，构图种类，尺寸锁，场景 prompt 里有没有尺度句和不该有的词。每张图写 `prompt_file`（相对计划文件的路径）让它能读到 prompt。全部渲染完，按实际画面给每张填 `scene_level_actual`，再跑一次 `plan_check.py --actual`，同样要 pass。字段值要能被审计者证伪；写成 "adds detail"、"three-quarter view" 这类无法核对的话等于未填。
 
 **计划级必填**
 
@@ -69,43 +74,51 @@ description: "为用户已有产品制作或审查 15 张 Etsy 商品图，保�
 | `product_truth` | 已确认事实 + `unknowns` 列表 |
 | `source_classification`, `publish_readiness` | 上节四分类 + `VERIFIED_SUCCESS/PARTIAL/BLOCKED/UNVERIFIED` |
 | `category_adapter` | 6 项：`product_form`、`buyer_questions`（3–6 个具体问题）、`scene_capacity`（experience_led / balanced / proof_led）、`human_presence_budget`（含 `human_scale_risk`）、`role_substitutions`（缺证据的模板角色 → 替代角色）、`restricted_views`（参考图未覆盖、不得虚构的面/状态） |
+| `art_direction` | 读懂产品、读懂买家、`selling_points`（三到五条卖点，各配证据和构图）、`atmosphere`（场合型 / 生活型 / 证据型、买家要的那一幕、感受、场合信号、发光物、人的痕迹、产品状态）、视觉世界、光、色板、台面、道具卡司、镜头、`mood_profile`、`why_this_product`（字段见 photo-engine 的 art-direction.md 第 3 节和 composition-library.md） |
+| `scale_lock` | 真实尺寸及来源、尺寸级别、与手或小臂的关系、每个场景最多两个尺寸稳定的参照物及相对关系、产品落点（字段见 photo-engine 的 scale-realism.md 第 1 节）；没有可靠尺寸写 `unverified`，只拍没有尺度参照的画面 |
+| `motif_proof` | 仅印花、刺绣、插画图案类产品：图案的精确证据由什么提供（实拍或参考裁切 / 平面原图的确定性图 / 用户批准远景里的 `motif_redraw`） |
+| `image_backend` | `builtin` 或 `openrouter`（见「生成能力与依赖」） |
 | `dimension_data_locked` | 锁定的数字、单位、标签；无尺寸时写 `none` 并选 `scale_effect` 或 `dimension-ready_inventory` |
 | `non_included_items` | 摆拍/比例道具中不包含的物品 |
 | `scene_counts` | `scene_bearing`（计划数 / 该档下限）、`plain_background`（计划数 / 预算）；proof_led 且无真实情境时写 `not_applicable` + 原因 |
 | `mandatory_prompt` | 上节原文 |
 
-**按条件必填**：`variation_mapping`（有 Variation 时，选项名 → 证据 → 图）；`furniture_scale`（家具尺度产品，见 [furniture-scale.md](references/furniture-scale.md)）；`color_temperature_exceptions`（任一镜头使用暖光源时）；`human_probe_result`（`human_presence_budget` > 0 且已生成首张含人图后：pass / reject）。
+**按条件必填**：`variation_mapping`（有 Variation 时，选项名 → 证据 → 图）；`furniture_scale`（家具尺度产品，见 [furniture-scale.md](references/furniture-scale.md)）；`color_temperature_exceptions`（`true_color` 镜头里出现暖光源时）；`human_probe_result`（`human_presence_budget` > 0 且已生成首张含人图后：pass / reject）。
 
-**每张图 5 个必填**（`shots[15]`）
+**每张图 6 个必填**（`shots[15]`）
 
 | 字段 | 要求 |
 | --- | --- |
 | `buyer_question` | 这张图回答哪个具体买家问题 |
+| `scene_level` | `L0` 纯底 / `L1` 点缀 / `L2` 一角 / `L3` 那一幕（photo-engine 的 atmosphere.md 第 3 节）；整套张数要过该产品类型的下限 |
+| `composition` | 构图代号（composition-library.md 第二节的 A–M）和它证明的卖点 |
 | `view` | 一句话：产品哪个面朝相机、如何转/倾、相机方位与高度、距离与裁切 |
 | `visible_view_cues` | 该视角成立时画面里**可观察到**的证据：透视缩短、哪个已有来源的面变宽/露出、边缘遮挡、支撑/佩戴关系。不写"三分之一侧面"这类不可核对的话 |
 | `evidence_source` | 支撑该视角可见区域与状态的参考图编号 |
 | `information_gain` | 相比其他 14 张，这张新增了什么受支持的买家信息 |
 
-**每张图按条件必填**：`reuse_group` + `reuse_reason`（与他图共用构图或底图时，写明比较的选项/步骤/细节/数值）；`scene_anchor`（场景型镜头：地点、产品与环境的接触关系、前中后景）；`human`（出现人体时：裁切、动作、接触点、不得遮挡的细节）；`lived_in`（家具场景）；`warm_light_source`（使用暖光时：光源、局部范围、保持中性的区域）。
+**每张图按条件必填**：`reuse_group` + `reuse_reason`（与他图共用构图或底图时，写明比较的选项/步骤/细节/数值）；`scene_anchor`（场景型镜头：地点、产品与环境的接触关系、前中后景）；`human`（出现人体时：裁切、动作、接触点、不得遮挡的细节）；`lived_in`（家具场景）；`warm_light_source`（使用暖光时：光源、局部范围、保持中性的区域）；`mood_profile`（整套为 `warm_scene` 时每张都标 `true_color` 或 `warm_scene`，证据镜头只能是 `true_color`）。
 
 ## 按需读取路由
 
 | 时机 | 读取 |
 | --- | --- |
+| 定场景、写任何 prompt 之前（每次生产，所有产品） | `../etsy-tony-full-photo-engine/references/art-direction.md` 和 `atmosphere.md` 全文；同目录 `composition-library.md` 读第一、二节和对得上的产品家族；`scene-library.md` 只读对得上的产品家族、场合、风格条目 |
 | 规划 15 个角色、分配视角（每次生产） | [shot-roles-and-views.md](references/shot-roles-and-views.md)、[category-adaptation.md](references/category-adaptation.md) |
 | `scene_capacity` 为 experience_led 或 balanced，且有生成的生活/使用/送礼场景 | [scene-planning.md](references/scene-planning.md) 全文 |
-| 写任何生成 prompt 之前、每批生成之后（所有产品，含 proof_led 与纯棚拍） | [scene-planning.md 第 3 节](references/scene-planning.md)（色温、色板与白平衡门）+ `scripts/color_cast_check.py` |
+| 写任何生成 prompt 之前、每批生成之后（所有产品，含 proof_led 与纯棚拍） | [scene-planning.md 第 3 节](references/scene-planning.md)（色彩准确、氛围与白平衡门）+ `scripts/color_cast_check.py` |
+| 任何一张图里有家具、门、壁炉、台面、手等参照物（几乎每次生产） | `../etsy-tony-full-photo-engine/references/scale-realism.md` + `../etsy-tony-full-photo-engine/scripts/scale_check.py` |
 | 产品是家具或家具尺度物件 | [furniture-scale.md](references/furniture-scale.md) |
 | 生成或逐张审查前（主图、尺寸、变体、个性化、技术参数） | [image-rules.md](references/image-rules.md)；视频与 alt text 段只在被要求时读 |
 | 制作或重新规划（执行顺序、探针、批次、生图工具） | [production-workflow.md](references/production-workflow.md) |
 | 接受整套或交付最终审计；用户只要求审图 | [final-audit.md](references/final-audit.md) |
 
-proof_led 且无生活场景的产品可跳过 scene-planning 第 1、2、4 节，但第 3 节色温门不可跳过。非家具产品不读 furniture-scale。
+proof_led 且无生活场景的产品可跳过 scene-planning 第 1、2、4 节，但第 3 节不可跳过。非家具产品不读 furniture-scale。美术方向对所有产品都要做：proof_led 产品的方向可以很短（干净的光、准确的色、一种台面），但不能没有。
 
 ## 生成能力与依赖
 
-- 产品保真、参考范围分离、exact-detail 不变量与 prompt 模板由 `../etsy-tony-full-photo-engine/SKILL.md` 提供；只读其 Non-Negotiables、Exact-Detail Products、Generate directly 三节。该文件不存在时，使用 [production-workflow.md](references/production-workflow.md) 内置的「生成要点」继续，并在报告中注明。
-- 生图工具用当前环境内置的图像生成能力（Codex 为 `image_gen`，Cursor 为 `GenerateImage`）。工具不支持参考图输入或不可用时，保存计划与 prompt，报告 `BLOCKED`，不调用外部 API。
+- 产品保真、参考范围分离、exact-detail 不变量与 prompt 模板由 `../etsy-tony-full-photo-engine/SKILL.md` 提供；只读其 Image Backend、Art Direction Gate、Non-Negotiables、Exact-Detail Products、Build one prompt per shot、Generate directly 六节。该文件或它的 `references/` 不存在时（只单装了本 Skill），使用 [production-workflow.md](references/production-workflow.md) 内置的「生成要点」继续，美术方向按其中的简版做，并在报告中注明。
+- 出图通道二选一，记在 `image_backend`。默认 `builtin`：当前环境内置的图像生成能力（Codex 为 `image_gen`，Cursor 为 `GenerateImage`）。用户要求用 OpenRouter 或 GPT 图片 API 时用 `openrouter`：通过 `../etsy-tony-full-photo-engine/scripts/openrouter_image.py` 调 `openai/gpt-image-2`，密钥只从环境变量 `OPENROUTER_API_KEY` 读，不向用户索要、不打印、不写进任何文件；每次调用都计费，第一次调用前说明计划张数，结束时报告实际花费。两个通道都不可用时，保存计划与 prompt，报告 `BLOCKED`，不调用这两者以外的服务。
 - 色偏测量与确定性白平衡修正用随 Skill 附带的 `scripts/color_cast_check.py`（依赖 Python 3 + Pillow + numpy，只读本地文件，不联网）。脚本不可运行时，退回逐张肉眼审并在报告里标明 `color_cast_status` 为 `UNVERIFIED`，不得据此声明整套色彩通过。
 
 ## 输出
@@ -117,16 +130,19 @@ proof_led 且无生活场景的产品可跳过 scene-planning 第 1、2、4 节�
   plan.codex-direct.json
   source-manifest.json       # 每张参考图：文件名、来源类型（自有实拍/授权买家图/许可 mockup/渲染/AI）、授权状态
   prompts/shot-01.txt … shot-15.txt
-  shot-NN.png                # 仅 pass 的图；PARTIAL 时缺号保留空缺，不用他图补位
+  shot-NN.png                # pass 的图，以及只有图案微重画（motif_redraw）的 borderline 图；其他失败缺号保留空缺，不用他图补位
+  borderline/shot-NN-attemptK.png # 同一镜头的备选稿（可选）
   rejected/shot-NN-attemptK.png   # 记录有意义的保真失败
   alt-text.json              # 仅 Listing 交接时
-  color-cast-report.json     # scripts/color_cast_check.py 输出：每张 neutral_b / frame_rb / status，含修正记录
+  plan-check.json            # scripts/plan_check.py --json 的输出，生成前一次、渲染后 --actual 一次
+  color-cast-report.json     # scripts/color_cast_check.py 输出：每张 profile / neutral_b / frame_rb / status，含修正记录
+  generation-log.jsonl       # 仅 openrouter 通道：每次调用的模型与花费
   fidelity-audit.json
   listing-readiness-audit.json    # 含 missing_shots 与原因
   video-01-brief.txt / video-02-brief.txt   # 仅被要求时
 ```
 
-最终报告分开列出：核对过的参考与事实；生成与交付的文件；被拒、重生成、参考裁切、缺失的镜头；锁定尺寸数据 vs 仅比例线索；实拍 / mockup / AI / 个性化 / Variation / 授权状态；色偏测量摘要（整套 `median_neutral_b`、borderline/reject 数、做过白平衡修正的镜头与增益、登记的暖光例外）；四个审计状态位（`product_fidelity_status`、`shot_effectiveness_status`、`set_coverage_diversity_status`、`publish_readiness`）；在线 Listing 核验状态；阻塞项与卖家需做的最小动作。
+最终报告分开列出：美术方向（一句话的视觉世界、`mood_profile` 及依据）；出图通道，`openrouter` 时加调用次数、总花费和用了备用模型的镜头；核对过的参考与事实；生成与交付的文件；被拒、重生成、参考裁切、缺失的镜头；锁定尺寸数据 vs 仅比例线索；实拍 / mockup / AI / 个性化 / Variation / 授权状态；色偏测量摘要（整套 `median_neutral_b`、borderline/reject 数、做过白平衡修正的镜头与增益、登记的暖光例外）；审美门未过或主图 `click` 未核实的镜头；四个审计状态位（`product_fidelity_status`、`shot_effectiveness_status`、`set_coverage_diversity_status`、`publish_readiness`）；在线 Listing 核验状态；阻塞项与卖家需做的最小动作。
 
 完成本轮交付与验收后结束。不自动追加下一项业务，不要求用户重新调用同一任务。
 

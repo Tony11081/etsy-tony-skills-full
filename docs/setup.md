@@ -5,7 +5,7 @@
 | 任务 | 依赖 | 未具备时 |
 | --- | --- | --- |
 | 标题、文案、已有资料分析 | 支持 Skills 的 AI 客户端 | 不需要额外 API Key |
-| 商品图、设计概念图 | 可看图且有内置 `image_gen` 的 Codex 环境 | 保存计划与输入，准确报告无法出图 |
+| 商品图、设计概念图 | 可看图且有内置 `image_gen` 的 Codex 环境；商品图可改用自己的 OpenRouter 密钥（见下） | 保存计划与输入，准确报告无法出图 |
 | 当前公开市场/政策研究 | 浏览或网页读取工具 | 只分析已有资料，不伪称实时验证 |
 | eRank 会员证据 | 使用者自己的会员浏览器会话或 CSV/HTML/JSON 导出 | 不把公开样本/本地估算当会员数据 |
 | eRank CLI、定价、校验脚本 | Python 3.10+；CLI 另需 click、requests、Pillow | 可先做不依赖脚本的部分，真实计算与验证状态单列 |
@@ -32,6 +32,16 @@ python scripts/run_erank.py -- --json live sources
 实际请求使用使用者自行配置的 `GIGAB2B_CLIENT_ID`、`GIGAB2B_CLIENT_SECRET`；可选 `GIGAB2B_API_BASE`，默认官方 OpenAPI。也可显式指定一个仓库外的私有 `--env-file`。不要把凭据贴进对话、命令示例、截图或提交。
 
 该脚本保留 SKU 下载、收藏读取、商品详情、价格、库存、图片/附件与恢复交接；下载完成后仍需实际看图核验。账号未配置时不能把素材提取报为成功。
+
+## 可选的 OpenRouter 出图通道
+
+商品图默认用宿主内置的图片工具，不需要任何密钥。想改用 OpenAI 的 GPT 图片模型时，`etsy-tony-full-photo-engine` 和 `etsy-tony-full-photo-15` 可以走 OpenRouter：在任务里说明「用 OpenRouter 出图」即可。
+
+- 在自己的终端环境里设置 `OPENROUTER_API_KEY`（在 OpenRouter 账号里创建）。不要把密钥贴进对话、命令示例、截图或提交；脚本只从环境变量读取，不打印，也不写入任何文件。
+- 可选：`ETSY_TONY_IMAGE_MODEL` 更换默认模型（默认 `openai/gpt-image-2`）；`OPENROUTER_BASE_URL` 更换接口地址。
+- 不花钱先检查一遍输入：在 `etsy-tony-full-photo-engine` 目录执行 `python scripts/openrouter_image.py --prompt "test" --out test.png --dry-run`，它不发送任何请求。
+- 这条通道按张计费，从使用者自己的 OpenRouter 账户扣；每次调用的模型和花费记在输出目录的 `generation-log.jsonl`。参考图会上传给 OpenRouter 和模型提供方，只提交本次商品需要的图。
+- 只需要 Python 3 标准库；装了 Pillow 时会自动缩小过大的参考图。
 
 ## 可选的 Clawlist Gemini 流程
 
