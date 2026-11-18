@@ -51,7 +51,7 @@ VISUAL Round 1 必须填写；STANDARD / FULL-B 可标记 Not Applicable。
 | Material / finish direction | | | |
 | Use-scene styling | | | |
 
-Record at least four meaningful axes.
+Record the copy check: illustration, arrangement, and text each differ from the benchmark; style may match.
 
 ## Unknowns not represented as facts
 

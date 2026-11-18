@@ -10,6 +10,7 @@ description: "制作可挑选的 Etsy 概念方向并按所选款继续开发；
 - 材料：产品对象、锁定项、变化范围及可用参考；保留已接受的方向。
 - 范围：先出图请求用 VISUAL；其默认六张独立概念图完成后等选款，详细开发只覆盖用户选中的范围。
 - 验收：实际显示并查看概念图；概念和矢量稿不能冒充实物证据或生产文件。
+- 实物事实先行：出图前要有成品尺寸、材质工艺和定制项；缺就一次问全，之后按真实比例出图，不凭感觉画比例。
 
 
 中文名称：Etsy-Tony 设计理论与工艺驱动的 SKUs 开发系统。
@@ -66,9 +67,9 @@ Use this order: `Product → Material → Surface and Functional Zones → Ideal
 
 Keep Base SKU, Customer Selectable Option, Personalization Input, Add-on, Separate SKU, and Separate Listing distinct. A buyer changing a name, date, or allowed font normally changes an order input, not the Base SKU.
 
-### P5 — LEARN THE GRAMMAR, NOT THE DESIGN
+### P5 — FOLLOW THE VALIDATED STYLE, NEVER COPY THE ARTWORK
 
-Learn category, customer need, usage scene, generic motif/style, generic composition logic, and generic personalization logic. Do not copy distinctive illustration, composition, element combination, copywriting, logo, brand, character, protected art, or recognizable customization structure. Shared demand never licenses shared distinctive expression.
+A competitor design that already sells is market evidence. When benchmark listings are given or found, design in their style: overall mood, palette family, typeface category, motif type, broad layout structure, and personalization approach may stay close. The artwork itself must be ours: redraw every illustration and pattern, write our own layout details and wording, and never trace, edit, or cut out a competitor image, or carry its shop name, logo, watermark, brand, character, or protected art. Copy check: place the design beside its benchmark; if the illustration, the exact arrangement, or the text coincides, redo it. Do not drift away from a validated style just to look different.
 
 ## Input and evidence behavior
 

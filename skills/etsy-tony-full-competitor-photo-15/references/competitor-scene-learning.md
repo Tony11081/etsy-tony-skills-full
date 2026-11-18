@@ -1,3 +1,5 @@
+对标款模式（`scene_reference_mode=benchmark`）优先：卖得动的对标款的场景图可作场景风格参考，只学场景类型、布局、构图、道具类别、光线和氛围，不带入对方的产品、图案、文字和品牌，不复刻某一张图。
+
 # Competitor Scene Learning Schema
 
 Use this schema to convert public competitor observations into original scene direction without using competitor images as generation inputs.

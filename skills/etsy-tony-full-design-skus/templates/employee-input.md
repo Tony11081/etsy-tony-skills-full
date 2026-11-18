@@ -13,7 +13,7 @@
 
 - Desired Image Count（未填写时为 6 张独立图片）:
 - Owned / Authorized Blank Product Image（可用于保持产品几何的路径或附件）:
-- Competitor Image Role（只用于分析，不得作为编辑底图）:
+- Competitor Image Role（可作风格参考；不得作为编辑底图，不得照抄）:
 - Must-preserve Product Geometry / Parts:
 - Preferred Camera View:
 - Preferred Background / Use Scene:
@@ -53,7 +53,7 @@
 - Known Components:
 - Known Material:
 - Known Finish / Coating:
-- Known Size:
+- Known Size（出图前必填，mm）:
 - Known Surface / Functional Zones:
 - Known Production Process:
 - Known Internal Capability:

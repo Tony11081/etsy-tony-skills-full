@@ -11,13 +11,14 @@ Use this reference in VISUAL, STANDARD, and FULL-B. VISUAL assets help the user 
 - QUICK, PROCESS, and DESIGN: generate no image unless the user explicitly requests one.
 - FULL-C: follow the separate listing-image evidence ladder in `listing-and-image-launch-rules.md`.
 
-For VISUAL, do not run the full Originality Gate before Round 1, but remove competitor-specific/protected expressions from the brief and generate independently from Product/buyer needs. STANDARD and FULL-B still require the applicable Originality Gate first. Do not use an attractive render to rescue a failed candidate.
+For VISUAL, do not run the full Originality Gate before Round 1, but keep protected expressions out of the brief; when benchmark listings exist, design in their style under P5. STANDARD and FULL-B still require the applicable Originality Gate first. Do not use an attractive render to rescue a failed candidate.
 
 ## VISUAL pre-visual screen
 
 Keep this internal or report it in at most twelve short bullets:
 
 - Product identity and what must not change;
+- confirmed finished size and aspect ratio; if size, material/process, or personalization inputs are missing, ask for all of them once before generating;
 - owned/authorized base image versus competitor evidence;
 - main functional, grip, edge, opening, cleaning, safety, or wear zones;
 - confirmed material/finish facts and Unknowns;
@@ -40,13 +41,13 @@ Prompts must state the Product identity lock, must-preserve geometry, concept na
 
 Image models are not production typography tools. When exact lettering is not essential to the selection, use a blank personalization zone or one short clearly identified placeholder and label typography as directional. When exact text is essential, inspect it and reject material misspelling. After selection, rebuild approved lettering as editable vector artwork; never treat generated text pixels as a production file.
 
-## Originality distance
+## Benchmark style, not a copy
 
-Concept images may learn the category and buyer need, but must not reproduce competitor-specific artwork, recognizable element combinations, composition, lettering, scene styling, or customization structure. Record meaningful distance on at least four axes such as silhouette, motif system, typography, composition, personalization architecture, material/finish direction, or use-scene styling.
+When benchmark listings are given or found, concept images follow their style (P5): mood, palette family, typeface category, motif type, broad layout, personalization approach, and scene feel may stay close. They must not reproduce the benchmark's specific artwork, exact arrangement, lettering content, or one particular photo. Run the copy check in `originality-and-ip-rules.md` on every concept and record it in the manifest.
 
-Do not feed a competitor image into an edit or ask for a near-copy. Generate from the approved original design record.
+A benchmark image may be passed to the image model as a style reference. It must never be the edit target or visual base, and never ask for a near-copy.
 
-For VISUAL, an owned/authorized blank Product image may be used as the geometry anchor. A competitor image may be analyzed for generic category language but must not be the edit target or visual base.
+For VISUAL, an owned/authorized blank Product image may be used as the geometry anchor.
 
 ## Evidence label and prohibited implications
 
@@ -56,7 +57,7 @@ Until the exact production scope has physical-sample evidence, every file entry 
 
 Before sample verification:
 
-- use environmental scale only; do not invent exact dimensions or thickness;
+- use the confirmed size and true aspect ratio when given, otherwise environmental scale only; do not invent dimensions or thickness;
 - do not imply confirmed material, finish, color match, food-contact suitability, durability, process quality, packaging, or included accessories;
 - do not label the asset as real product photography, sample, approved, listing-ready, or published;
 - keep props visually secondary and do not imply that they are included.
@@ -66,7 +67,7 @@ Before sample verification:
 ### VISUAL Round 1 selection set
 
 - Six separate accepted images labeled `V01–V06`.
-- Three clearly different Visual Families with two concepts each unless the user specifies another breadth.
+- With benchmarks: concepts grouped by benchmark style, two or three per benchmark. Without benchmarks: three clearly different Visual Families with two concepts each. The user's stated breadth wins.
 - One stable Product identity and comparable view/background/lighting logic across the set.
 - Each concept differs from its siblings on at least three meaningful axes, including at least one of narrative, motif role/treatment, composition/hierarchy, personalization architecture, or Placement strategy.
 - Color-only, font-only, flower-species-only, and scene-only changes do not count as separate concepts.

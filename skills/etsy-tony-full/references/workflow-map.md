@@ -8,7 +8,8 @@
 | 还没定产品，先判断机会或开发问题 | `etsy-tony-full-product-studio` | 用 ANALYZE 或最小适用阶段；缺市场证据就保留缺口 |
 | 判断材料、结构、工艺和打样条件 | `etsy-tony-full-manufacturing` | 只做具体工艺判断；用户明确选择其他匹配入口时沿用 |
 | 根据已通过工艺的产品建立设计系列 | `etsy-tony-full-design-system` | 设计系统，不自动创建完整 SKUs |
-| 先给几张新款方案让我挑 | `etsy-tony-full-design-skus` | VISUAL；通用默认六张独立图，用户数量要求优先 |
+| 先给几张新款方案让我挑 | `etsy-tony-full-design-skus` | VISUAL；有对标款就按对标款的风格出（不照抄），默认六张独立图，用户数量要求优先 |
+| 给竞品或关键词，要又快又批量地出一整套图 | `etsy-tony-full-fast-lane` | 出图单先行，找对标款做同风格设计；只在挑款、挑图两处等人 |
 | 从竞品需求重新开发原创产品 | `etsy-tony-full-original-product` | 产品本身改变；默认三款原创概念并等待选款 |
 | 产品已定，只做编码、选项和依赖 | `etsy-tony-full-skus` | 名字或日期输入不等于新 SKU；维护不重做开发 |
 | 明确要求跨研究、工艺、设计、SKUs 开发 | `etsy-tony-full-product-development` | 一个产品开发主流程，复用通过的上游 gate |
@@ -19,7 +20,7 @@
 | 明确要求 eRank + Clawlist Gemini 工具链 | `etsy-tony-full-erank-listing` | 不因提到 eRank 就强迫普通文案用外部模型 |
 | 现有产品的 15 张 Etsy 图，或审查该套图 | `etsy-tony-full-photo-15` | 保留产品；审图不生成。不是平台图片上限说明 |
 | 按参考图改款或迁移设计语言 | `etsy-tony-full-from-reference` | 用自有产品图验收改款，保存可复用的产品视觉档案 |
-| 竞品拍摄研究，并给自己的产品做 15 张图 | `etsy-tony-full-competitor-photo-15` | 两项都需要才选；竞品不能作图像生成参考 |
+| 竞品拍摄研究，并给自己的产品做 15 张图 | `etsy-tony-full-competitor-photo-15` | 两项都需要才选；对标款场景图只作场景风格参考，不作产品依据 |
 | 只给现有产品改一张图或其他数量场景 | `etsy-tony-full-photo-engine` | 共享图片能力；沿用产品事实，不扩展成 15 张 |
 | 蛋糕刀铲刻字设计或把图案放到产品上 | `etsy-tony-full-engraving` | 只动指定雕刻区，以使用者提供的真实产品底图为准 |
 | 雕刻稿到母版再到完整刀铲场景组 | `etsy-tony-full-engraving-photo` | 母版通过前不开启场景批量生成 |

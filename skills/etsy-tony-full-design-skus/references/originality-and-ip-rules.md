@@ -2,47 +2,31 @@
 
 Apply P5 from `../SKILL.md`. This is a development screen, not legal clearance.
 
-## Generic versus distinctive
+## What may stay close and what must be ours
 
-Classify each competitor feature:
+Classify each benchmark feature:
 
-- Generic Category Language: dictated by Product type, function, or common buyer expectation.
-- Generic Design Style: a broad visual vocabulary such as minimal line art, Art Deco, or vintage botanical.
-- Competitor-specific Expression: the competitor's particular illustration, arrangement, hierarchy, pairing, wording, or customization structure.
-- Potentially Protected Expression: recognizable artwork, logo, brand, character, phrase, proprietary graphic, or distinctive overall expression requiring current verification.
+- Style (may stay close): overall mood, palette family, typeface category, motif type, broad layout structure, personalization approach, finish promise.
+- Competitor-specific artwork (must be ours): the particular illustration or pattern, the exact arrangement of elements, wording, naming, and sample text.
+- Potentially Protected Expression (never use): recognizable artwork, logo, brand, character, phrase, or proprietary graphic requiring current verification.
 
-Category need and generic style may inform a new concept. Competitor-specific or potentially protected expression must not be preserved.
+A benchmark that sells is market evidence. Design in its style; do not move away from the style just to look different.
 
-## Originality Distance comparison
+## Copy check
 
-Compare:
-
-- Overall Visual Impression
-- Main Motif
-- Motif Treatment
-- Composition
-- Typography Relationship
-- Placement
-- Personalization Structure
-- Decorative Structure
-- Color/finish promise
-- Copywriting and buyer-facing naming where applicable
-
-Changing only flower species, font choice, color, customer name, or date is insufficient. If those are the only changes, the score cannot reach 4.
+Place the design beside its benchmark and compare three things: the illustration or pattern, the exact arrangement, and the text. None may coincide, and a buyer must be able to tell the two apart as different listings. Changing only the customer name or date on the benchmark's own artwork is copying.
 
 ## Originality Distance Score
 
 | Score | Meaning | Decision |
 |---:|---|---|
-| 5 | Overall language, composition, motif treatment, typography relationship, and customization are clearly different. | Pass |
-| 4 | Serves the same market need through a clearly different expression. | Pass |
-| 3 | Some change, but several recognizable expression dimensions remain shared. | Redesign and rescore |
-| 2 | Mostly motif/font/color substitution. | Reject |
-| 1 | Overall impression approaches copying. | Reject |
+| 5 | Same style family; illustration, arrangement, and wording are all ours. | Pass |
+| 4 | Same style; one of the three is close to the benchmark but does not coincide. | Pass |
+| 3 | One of illustration, arrangement, or wording coincides. | Redo that part and rescore |
+| 2 | The benchmark's artwork with motif, font, or color swapped. | Reject |
+| 1 | Reads as the same listing. | Reject |
 
-Passing line: `≥4`. A score of 3 is a Hard Gate failure until redesigned. Below 3 is rejected.
-
-For each score, cite the observed competitor evidence and state which meaningful axes differ. Missing competitor imagery limits certainty; label that limitation rather than inflating the score.
+Passing line: `≥4`. For each score, cite the benchmark evidence and state what was redrawn or rewritten. Missing benchmark imagery limits certainty; label that limitation.
 
 ## Copyright, trademark, and other IP checks
 
@@ -63,4 +47,4 @@ Use these uncertainty labels:
 
 ## Redesign rules
 
-Do not repair a failed concept by swapping flower, font, or color. Rebuild from buyer job and process constraints, changing several meaningful axes such as narrative, motif role and treatment, hierarchy, composition, personalization structure, surface strategy, material/finish, or production identity. Then repeat the entire comparison and record the new evidence.
+Fix what coincided: redraw the illustration, rearrange the details, or rewrite the text, then repeat the copy check. Keep the benchmark's style; rebuild in a different style only when the user asks for one.
