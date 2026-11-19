@@ -9,7 +9,6 @@
 | 判断材料、结构、工艺和打样条件 | `etsy-tony-full-manufacturing` | 只做具体工艺判断；用户明确选择其他匹配入口时沿用 |
 | 根据已通过工艺的产品建立设计系列 | `etsy-tony-full-design-system` | 设计系统，不自动创建完整 SKUs |
 | 先给几张新款方案让我挑 | `etsy-tony-full-design-skus` | VISUAL；有对标款就按对标款的风格出（不照抄），默认六张独立图，用户数量要求优先 |
-| 给竞品或关键词，要又快又批量地出一整套图 | `etsy-tony-full-fast-lane` | 出图单先行，找对标款做同风格设计；只在挑款、挑图两处等人 |
 | 从竞品需求重新开发原创产品 | `etsy-tony-full-original-product` | 产品本身改变；默认三款原创概念并等待选款 |
 | 产品已定，只做编码、选项和依赖 | `etsy-tony-full-skus` | 名字或日期输入不等于新 SKU；维护不重做开发 |
 | 明确要求跨研究、工艺、设计、SKUs 开发 | `etsy-tony-full-product-development` | 一个产品开发主流程，复用通过的上游 gate |
